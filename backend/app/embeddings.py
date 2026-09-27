@@ -4,10 +4,12 @@ import json
 import math
 import os
 from uuid import UUID
+from time import perf_counter
 
 import httpx
 import psycopg
 from fastapi import HTTPException
+from app.tracing import Trace
 
 MODEL = "text-embedding-3-small"
 DIMENSIONS = 1536
@@ -78,7 +80,7 @@ def lock_key(document_id: UUID) -> int:
     return (document_id.int >> 64) - (1 << 63)
 
 
-def embedding_summary(connection: psycopg.Connection, document_id: UUID) -> dict:
+def embedding_summary(connection: psycopg.Connection, document_id: UUID, *, owns_lock=False) -> dict:
     row = connection.execute("""
         SELECT d.embedding_status, d.embedding_error, count(c.id),
                count(c.embedding), count(*) FILTER (WHERE c.embedding_status = 'failed')
@@ -88,7 +90,8 @@ def embedding_summary(connection: psycopg.Connection, document_id: UUID) -> dict
     if row is None:
         raise HTTPException(status_code=404, detail="Document not found")
     state, error, total, embedded, failed = row
-    if state == "processing":
+    # Session locks are reentrant: the processing worker must not probe its own lock.
+    if state == "processing" and not owns_lock:
         acquired = connection.execute("SELECT pg_try_advisory_lock(%s)", (lock_key(document_id),)).fetchone()[0]
         if acquired:
             connection.execute("SELECT pg_advisory_unlock(%s)", (lock_key(document_id),))
@@ -102,8 +105,9 @@ def embedding_summary(connection: psycopg.Connection, document_id: UUID) -> dict
     }
 
 
-def process_embeddings(connection: psycopg.Connection, document_id: UUID) -> dict:
+def process_embeddings(connection: psycopg.Connection, document_id: UUID, trace=None) -> dict:
     """Run in a sync API worker. Commit each batch, retaining a session-level lock."""
+    trace = trace or Trace()
     connection.autocommit = True
     if not connection.execute("SELECT 1 FROM documents WHERE id = %s", (document_id,)).fetchone():
         raise HTTPException(status_code=404, detail="Document not found")
@@ -123,18 +127,32 @@ def process_embeddings(connection: psycopg.Connection, document_id: UUID) -> dic
         """, (document_id,)).fetchall()
         if not pending:
             connection.execute("UPDATE documents SET embedding_status = 'complete', embedding_error = NULL WHERE id = %s", (document_id,))
+            trace.emit("embedding_skipped", reason="All vectors are already stored.")
+            trace.emit("storage_skipped", reason="All vectors are already stored.")
             return embedding_summary(connection, document_id)
 
         with connection.transaction():
             connection.execute("UPDATE documents SET embedding_status = 'processing', embedding_error = NULL WHERE id = %s", (document_id,))
             connection.execute("UPDATE chunks SET embedding_status = 'pending' WHERE document_id = %s AND embedding IS NULL", (document_id,))
         try:
+            trace.start("embedding", model=MODEL, dimensions=DIMENSIONS, remaining_chunks=len(pending))
+            embedding_ms, storage_ms = 0.0, 0.0
             with create_embedding_client() as client:
                 for start in range(0, len(pending), BATCH_SIZE):
                     batch = pending[start:start + BATCH_SIZE]
                     ids = [row[0] for row in batch]
+                    trace.stage = "embedding"
+                    trace.emit("embedding_progress", processed_chunks=start, remaining_chunks=len(pending) - start)
                     connection.execute("UPDATE chunks SET embedding_status = 'processing' WHERE id = ANY(%s)", (ids,))
+                    started = perf_counter()
                     vectors = embed_texts(client, [row[1] for row in batch])
+                    embedding_ms += (perf_counter() - started) * 1000
+                    if start + len(batch) == len(pending):
+                        trace.emit("embedding_completed", duration_ms=round(embedding_ms, 2), chunk_count=len(pending), dimensions=DIMENSIONS)
+                    if start == 0:
+                        trace.start("storage", kind="vectors")
+                    trace.stage = "storage"
+                    started = perf_counter()
                     # The cast persists all dimensions; previews are computed on read.
                     with connection.transaction():
                         with connection.cursor() as cursor:
@@ -143,7 +161,10 @@ def process_embeddings(connection: psycopg.Connection, document_id: UUID) -> dic
                                     embedding_status = 'embedded', embedded_at = now()
                                 WHERE id = %s AND embedding IS NULL
                             """, [(json.dumps(vector, allow_nan=False), row[0]) for row, vector in zip(batch, vectors, strict=True)])
+                    storage_ms += (perf_counter() - started) * 1000
+                    trace.emit("storage_progress", stored_this_run=start + len(batch), **embedding_summary(connection, document_id, owns_lock=True))
             connection.execute("UPDATE documents SET embedding_status = 'complete', embedding_error = NULL WHERE id = %s", (document_id,))
+            trace.emit("storage_completed", duration_ms=round(storage_ms, 2), kind="vectors", **embedding_summary(connection, document_id))
         except (EmbeddingError, psycopg.Error) as exc:
             message = str(exc) if isinstance(exc, EmbeddingError) else "Could not store embeddings. Retry to resume remaining chunks."
             # If the database is disconnected this may fail too. The next request

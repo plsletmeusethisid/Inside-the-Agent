@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.embeddings import DIMENSIONS, MODEL, PREVIEW_SIZE, EmbeddingError, create_embedding_client, embed_texts
+from app.tracing import Trace
 
 
 class RetrievalRequest(BaseModel):
@@ -27,7 +28,8 @@ class RetrievalRequest(BaseModel):
         return value
 
 
-def retrieve(connection: psycopg.Connection, document_id: UUID, request: RetrievalRequest) -> dict:
+def retrieve(connection: psycopg.Connection, document_id: UUID, request: RetrievalRequest, trace=None) -> dict:
+    trace = trace or Trace()
     # Validate completeness before spending a provider request. Uploads are immutable.
     row = connection.execute("""
         SELECT count(c.id), count(c.embedding),
@@ -44,15 +46,16 @@ def retrieve(connection: psycopg.Connection, document_id: UUID, request: Retriev
         raise HTTPException(status_code=409, detail="Stored embedding model is incompatible. An explicit migration is required.")
     connection.commit()  # Do not hold an idle transaction during the provider call.
 
-    started = perf_counter()
+    started = trace.start("query_embedding", model=MODEL, dimensions=DIMENSIONS)
     try:
         with create_embedding_client() as client:
             vector = embed_texts(client, [request.question])[0]
     except EmbeddingError as exc:
         raise HTTPException(status_code=502, detail=f"Question embedding failed: {exc}") from None
     embedding_ms = (perf_counter() - started) * 1000
+    trace.complete("query_embedding", started, preview=vector[:PREVIEW_SIZE], model=MODEL, dimensions=DIMENSIONS)
 
-    started = perf_counter()
+    started = trace.start("retrieval", searched_chunks=embedded, k=request.k, min_similarity=request.min_similarity)
     # <=> is pgvector cosine distance. No approximate index or cross-document search.
     rows = connection.execute("""
         SELECT id, chunk_index, page_number, content, token_count,
@@ -66,7 +69,7 @@ def retrieve(connection: psycopg.Connection, document_id: UUID, request: Retriev
     """, (json.dumps(vector), document_id, MODEL, DIMENSIONS,
           json.dumps(vector), request.min_similarity, json.dumps(vector), request.k)).fetchall()
     search_ms = (perf_counter() - started) * 1000
-    return {
+    result = {
         "document_id": str(document_id), "question": request.question,
         "k": request.k, "min_similarity": request.min_similarity,
         "searched_chunks": embedded, "model": MODEL, "dimensions": DIMENSIONS,
@@ -79,3 +82,5 @@ def retrieve(connection: psycopg.Connection, document_id: UUID, request: Retriev
             "similarity": row[5],
         } for rank, row in enumerate(rows, 1)],
     }
+    trace.complete("retrieval", started, **result)
+    return result

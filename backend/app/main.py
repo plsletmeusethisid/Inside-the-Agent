@@ -8,12 +8,14 @@ import psycopg
 import pymupdf
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.concurrency import run_in_threadpool
 
 from app.ingestion import chunk_pages, parse_pdf
 from app.database import apply_schema
 from app.embeddings import PREVIEW_SIZE, embedding_summary, process_embeddings
 from app.retrieval import RetrievalRequest, retrieve
 from app.generation import generate_answer
+from app.tracing import Trace, trace_response
 
 MAX_PDF_BYTES = 10 * 1024 * 1024
 
@@ -36,7 +38,7 @@ async def lifespan(_app: FastAPI):
     yield
 
 
-app = FastAPI(title="Agent Pipeline API", version="0.5.0", lifespan=lifespan)
+app = FastAPI(title="Agent Pipeline API", version="0.6.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")],
@@ -72,6 +74,22 @@ async def upload_document(
     chunk_size: int = Form(500, ge=50, le=1200),
     chunk_overlap: int = Form(75, ge=0, le=300),
 ) -> dict:
+    filename, data = await read_upload(file, chunk_size, chunk_overlap)
+    return await run_in_threadpool(ingest_document, filename, data, chunk_size, chunk_overlap, uuid4())
+
+
+@app.post("/documents/stream")
+async def stream_upload(
+    file: UploadFile = File(...),
+    chunk_size: int = Form(500, ge=50, le=1200),
+    chunk_overlap: int = Form(75, ge=0, le=300),
+):
+    filename, data = await read_upload(file, chunk_size, chunk_overlap)
+    document_id = uuid4()
+    return trace_response(lambda trace: ingest_document(filename, data, chunk_size, chunk_overlap, document_id, trace), document_id)
+
+
+async def read_upload(file, chunk_size, chunk_overlap):
     """Parse a selectable-text PDF and persist pages and page-aware chunks."""
     if chunk_overlap >= chunk_size:
         raise HTTPException(status_code=422, detail="Overlap must be smaller than chunk size")
@@ -84,6 +102,12 @@ async def upload_document(
         raise HTTPException(status_code=413, detail="PDF exceeds the 10 MB limit")
     if not data.startswith(b"%PDF-"):
         raise HTTPException(status_code=415, detail="File is not a PDF")
+    return filename, data
+
+
+def ingest_document(filename, data, chunk_size, chunk_overlap, document_id, trace=None):
+    trace = trace or Trace()
+    started = trace.start("parse")
 
     try:
         pages = parse_pdf(data)
@@ -93,9 +117,11 @@ async def upload_document(
         raise HTTPException(status_code=422, detail="PDF has no pages")
     if not any(page.content for page in pages):
         raise HTTPException(status_code=422, detail="No selectable text found; scanned PDFs require OCR")
-
+    trace.complete("parse", started, page_count=len(pages))
+    started = trace.start("chunking", chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     chunks = chunk_pages(pages, chunk_size, chunk_overlap)
-    document_id = uuid4()
+    trace.complete("chunking", started, chunk_count=len(chunks), token_count=sum(chunk.token_count for chunk in chunks))
+    started = trace.start("storage", kind="pages_and_chunks")
     try:
         with database_connection() as connection:
             with connection.cursor() as cursor:
@@ -113,7 +139,7 @@ async def upload_document(
                 )
     except psycopg.Error as exc:
         raise HTTPException(status_code=503, detail="Could not store document") from exc
-
+    trace.complete("storage", started, kind="pages_and_chunks", chunk_count=len(chunks))
     return {"id": str(document_id), "filename": filename, "page_count": len(pages), "chunk_count": len(chunks), "chunk_size": chunk_size, "chunk_overlap": chunk_overlap}
 
 
@@ -198,3 +224,30 @@ def answer_document(document_id: UUID, request: RetrievalRequest) -> dict:
         raise HTTPException(status_code=503, detail="Could not search document. Check the database and retry.") from exc
     # Release the database connection before waiting for the generation provider.
     return generate_answer(context)
+
+
+@app.post("/documents/{document_id}/embeddings/stream")
+def stream_embeddings(document_id: UUID):
+    def run(trace):
+        with database_connection() as connection:
+            return process_embeddings(connection, document_id, trace)
+    return trace_response(run, document_id)
+
+
+def stream_question(document_id, request, answer):
+    def run(trace):
+        trace.emit("question", question=request.question)
+        with database_connection() as connection:
+            context = retrieve(connection, document_id, request, trace)
+        return generate_answer(context, trace) if answer else context
+    return trace_response(run, document_id)
+
+
+@app.post("/documents/{document_id}/retrieve/stream")
+def stream_retrieval(document_id: UUID, request: RetrievalRequest):
+    return stream_question(document_id, request, False)
+
+
+@app.post("/documents/{document_id}/answer/stream")
+def stream_answer(document_id: UUID, request: RetrievalRequest):
+    return stream_question(document_id, request, True)

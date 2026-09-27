@@ -19,6 +19,7 @@ from fastapi.testclient import TestClient
 from app.database import SQL_DIR, apply_schema
 from app.embeddings import DIMENSIONS, MODEL, lock_key
 from app.main import app
+from app.tracing import Trace, TraceCancelled
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 
@@ -86,6 +87,54 @@ class StorageTests(unittest.TestCase):
             row = connection.execute("SELECT content, embedding, embedding_status FROM chunks WHERE id = %s", (self.legacy_chunk,)).fetchone()
             self.assertEqual(row, ("Preserved legacy text", None, "pending"))
             self.assertEqual(connection.execute("SELECT count(*) FROM schema_migrations").fetchone()[0], 1)
+
+    @staticmethod
+    def events(response):
+        return [json.loads(line[6:]) for line in response.text.splitlines() if line.startswith("data: ")]
+
+    def test_streamed_upload_embedding_and_retrieval_have_real_outputs(self):
+        import pymupdf
+        with pymupdf.open() as pdf:
+            pdf.new_page().insert_text((72, 72), "Use the VPN client to connect to work.")
+            data = pdf.tobytes()
+        response = self.client.post("/documents/stream", files={"file": ("guide.pdf", data, "application/pdf")}, data={"chunk_size": 50, "chunk_overlap": 10})
+        self.assertIn("text/event-stream", response.headers["content-type"])
+        events = self.events(response)
+        self.assertEqual([e["event"] for e in events], ["trace_started", "parse_started", "parse_completed", "chunking_started", "chunking_completed", "storage_started", "storage_completed", "completed"])
+        doc = events[-1]["data"]["result"]
+        self.assertEqual(doc["chunk_count"], 1)
+        with self.provider(self.success):
+            embedded = self.events(self.client.post(f"/documents/{doc['id']}/embeddings/stream"))
+            retrieved = self.events(self.client.post(f"/documents/{doc['id']}/retrieve/stream", json={"question": "How to connect?"}))
+        self.assertEqual(embedded[-1]["data"]["result"]["embedded_chunks"], 1)
+        progress = next(e for e in embedded if e["event"] == "storage_progress")
+        self.assertEqual(progress["data"]["status"], "processing")
+        self.assertIsNone(progress["data"]["error"])
+        stored = next(e for e in embedded if e["event"] == "storage_completed")
+        self.assertEqual(stored["data"]["embedded_chunks"], 1)
+        self.assertEqual(retrieved[-1]["data"]["result"]["results"][0]["content"], "Use the VPN client to connect to work.")
+        repeat = self.events(self.client.post(f"/documents/{doc['id']}/embeddings/stream"))
+        self.assertIn("embedding_skipped", [e["event"] for e in repeat])
+        with patch("app.generation.create_generation_client", side_effect=AssertionError("Empty context called generation")), self.provider(self.success):
+            empty = self.events(self.client.post(f"/documents/{doc['id']}/answer/stream", json={"question": "q", "min_similarity": 1}))
+        self.assertIn("generation_skipped", [e["event"] for e in empty])
+
+    def test_cancel_after_committed_batch_retains_vectors_and_releases_lock(self):
+        from app.embeddings import process_embeddings, embedding_summary
+        document_id = self.document(33)
+        def stop_after_commit(event):
+            if event["event"] == "storage_progress":
+                raise TraceCancelled()
+        with self.provider(self.success), self.connection() as connection:
+            with self.assertRaises(TraceCancelled):
+                process_embeddings(connection, document_id, Trace(stop_after_commit))
+        with self.connection() as connection:
+            summary = embedding_summary(connection, document_id)
+            self.assertEqual(summary["status"], "interrupted")
+            self.assertEqual(summary["embedded_chunks"], 32)
+        with self.provider(self.success):
+            response = self.client.post(f"/documents/{document_id}/embeddings/stream")
+        self.assertEqual(self.events(response)[-1]["data"]["result"]["embedded_chunks"], 33)
 
     def test_real_vector_storage_preview_and_idempotent_retry(self):
         document_id = self.document()

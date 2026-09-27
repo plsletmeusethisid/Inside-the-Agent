@@ -7,7 +7,9 @@ services:
     environment:
       POSTGRES_DB: agent_demo
       POSTGRES_USER: agent_demo
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a production database password}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -20,9 +22,12 @@ services:
     build: ./backend
     restart: unless-stopped
     environment:
-      DATABASE_URL: ${DATABASE_URL:?Set the production database URL}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set the backend OpenAI key}
+      DATABASE_URL_FILE: /run/secrets/database_url
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:?Set the public HTTPS origin}
+    secrets:
+      - database_url
+      - openai_api_key
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api"]
     depends_on:
       db:
@@ -70,3 +75,11 @@ volumes:
   postgres_data:
   caddy_data:
   caddy_config:
+
+secrets:
+  postgres_password:
+    environment: POSTGRES_PASSWORD
+  database_url:
+    environment: DATABASE_URL
+  openai_api_key:
+    environment: OPENAI_API_KEY

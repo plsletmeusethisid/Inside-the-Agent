@@ -2,7 +2,6 @@
 
 import json
 import math
-import os
 from uuid import UUID
 from time import perf_counter
 
@@ -10,6 +9,7 @@ import httpx
 import psycopg
 from fastapi import HTTPException
 from app.tracing import Trace
+from app.config import read_secret, SecretConfigurationError
 
 MODEL = "text-embedding-3-small"
 DIMENSIONS = 1536
@@ -22,7 +22,10 @@ class EmbeddingError(Exception):
 
 
 def create_embedding_client() -> httpx.Client:
-    key = os.getenv("OPENAI_API_KEY", "").strip()
+    try:
+        key = read_secret("OPENAI_API_KEY")
+    except SecretConfigurationError as exc:
+        raise EmbeddingError(str(exc)) from None
     if not key:
         raise EmbeddingError("Set OPENAI_API_KEY on the backend, then retry embedding.")
     return httpx.Client(

@@ -4,4 +4,11 @@ __pycache__
 tests
 .env
 .env.*
+**/.env
+**/.env.*
+**/*.env
+**/*.pem
+**/*.key
+**/.secrets
+**/secrets
 

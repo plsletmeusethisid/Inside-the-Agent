@@ -6,7 +6,7 @@ The assistant has one fixed job: answer from the selected document's retrieved c
 
 ## Quick start
 
-Requires Docker with Compose. From the project root in PowerShell:
+Requires Docker with current Compose v2 (environment-sourced secrets). From the project root in PowerShell:
 
 ```powershell
 # Once, only if .env does not already exist:
@@ -15,7 +15,7 @@ Copy-Item .env.example .env
 docker compose up -d --build
 ```
 
-Open **http://localhost:3000**. API liveness: http://localhost:8000/health; database readiness: http://localhost:8000/ready; interactive API docs: http://localhost:8000/docs. Parsing works without an API key; embeddings, retrieval, and generation require it. The key is passed only to the backend. Preserve existing environment settings and never commit secrets.
+Open **http://localhost:3000**. API liveness: http://localhost:8000/health; database readiness: http://localhost:8000/ready; interactive API docs: http://localhost:8000/docs. Development ports bind only to localhost. Parsing works with `OPENAI_API_KEY=` left empty; embeddings, retrieval, and generation require it. Compose mounts the key only into the backend. Preserve existing environment settings and never commit secrets.
 
 Start with `examples/it-support-guide.pdf`, **50 tokens / 10 overlap**: inspect five chunks, select **Embed & store chunks**, then ask “How do I connect to the VPN?” or “How do I reset my password?”. Choose **Retrieve chunks only** to inspect search independently.
 
@@ -121,7 +121,7 @@ The current full answer check exits 1 for the documented no-answer failure. Omit
 From the root with Docker running:
 
 ```powershell
-docker compose run --rm --no-deps -v ./backend/tests:/app/tests:ro backend python -c "import os, sys, unittest; os.environ['TEST_DATABASE_URL'] = os.environ['DATABASE_URL']; result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.discover('tests')); sys.exit(not result.wasSuccessful())"
+docker compose run --rm --no-deps -v ./backend/tests:/app/tests:ro backend python -c "import os, sys, unittest; from app.config import read_secret; os.environ['TEST_DATABASE_URL'] = read_secret('DATABASE_URL'); result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.discover('tests')); sys.exit(not result.wasSuccessful())"
 docker compose exec -T frontend npm run lint
 docker compose exec -T frontend npm run typecheck
 docker compose exec -T frontend npm test
@@ -135,6 +135,8 @@ Database tests use a unique temporary schema; automated provider outputs are fix
 
 Observed on 2026-09-27: **47 backend tests**, **three frontend parser tests**, lint, TypeScript, and production Docker builds passed. Edge smoke passed actual PDF upload, embeddings, streamed answers, source highlighting, ranked-passage links, PDF bytes/page-link targets, source permalinks after reload, no-answer/empty-cutoff behavior, error/cancellation states, and 390px layout without browser errors. The existing non-failing TestClient/httpx deprecation warning remains. The host lacked local frontend dependencies, so checks ran in the built Docker container.
 
+Credential-hardening follow-up: **52 backend tests** passed, including mounted-secret loading and safe failure checks. Both local stacks were rebuilt/recreated with existing volumes. A redacted scan of Git history, resolved Compose configuration, container/image metadata, compiled browser assets, and recent service logs found no configured secret values or API-token patterns. Browser upload/source/mobile checks passed; parsing with an empty API key was also verified. This follow-up made no paid provider calls.
+
 ## Deployment
 
 [Deployment instructions and access decisions](deploy/README.md) cover the standalone production Compose stack, domain/TLS, same-origin `/api` routing, secrets, health checks, persistent storage, and smoke checks. Caddy forwards SSE without buffering; PostgreSQL is not published to the host. Remote deployment still requires a host/project, domain/routing, credentials, and access policy. No remote deployment URL is claimed.
@@ -143,6 +145,8 @@ The production configuration was also started locally at **http://localhost:8080
 
 ## Configuration, costs, and boundaries
 
+- Both Compose files source `OPENAI_API_KEY`, `DATABASE_URL`, and `POSTGRES_PASSWORD` from the ignored host environment file and deliver them as `/run/secrets/` files. Container configuration contains only `*_FILE` paths; the frontend receives no credentials or secret mounts. `backend/app/config.py` reads mounted secrets directly, fails safely if a configured file is unreadable, and supports ordinary environment variables when running Python outside Docker. Do not add credentials to `NEXT_PUBLIC_*`, Docker build arguments, or YAML literals. The public API URL and CORS origin are intentionally nonsecret.
+- Git and Docker build exclusions cover environment files, secret directories, and private-key files; example configuration remains tracked. These exclusions do not protect secrets already committed. Host/Docker administrators and processes inside an authorized container can still read mounted secrets; protect the ignored host environment files and use a managed secret store on a deployment platform. Do not publish environment dumps, `docker inspect` output from older containers, or old resolved Compose configurations.
 - `OPENAI_API_KEY` stays backend-only. Each retrieval embeds a question; each nonempty-context answer also consumes generation input/output tokens. Document overlap repeats embedding input. Retries can add cost. Current limits: batches of 32, at most 20 context chunks of up to 1,200 tokens, 2,000 output tokens, 10-second connect / 60-second provider-operation timeouts. Responses requests use `store: false`; this is not a claim about all provider retention policies.
 - Development `FRONTEND_ORIGIN` and `NEXT_PUBLIC_API_URL` default to `http://localhost:3000` and `http://localhost:8000`. CORS allows exactly the configured origin. A direct browser visit to `/ready` does not test cross-origin JavaScript; inspect the frontend request/headers. `NEXT_PUBLIC_` values are compiled into the client; rebuild after changing them.
 - Docker reads the root `.env`; local Python does not load it automatically. Recreate the backend after changing credentials. For local development, start `docker compose up -d db`, install `backend/requirements.txt`, set `DATABASE_URL`/`OPENAI_API_KEY`, and run `uvicorn app.main:app --reload`. In another terminal, run `npm.cmd ci` and `npm.cmd run dev` in `frontend/`.

@@ -8,7 +8,7 @@ Verified on 2026-09-27: the full Edge smoke passed through Caddy at `http://loca
 
 ## Deploy on an existing host
 
-1. Install Docker with Compose, copy/clone this repository to the host, and point your domain's DNS to it. Allow inbound 80/443. Keep application/database ports closed.
+1. Install Docker with current Compose v2 (including environment-sourced secrets), copy/clone this repository to the host, and point your domain's DNS to it. Allow inbound 80/443. Keep application/database ports closed.
 2. Copy `deploy/production.env.example` to `.env.production` in the project root. Set `SITE_ADDRESS` to the hostname, `FRONTEND_ORIGIN` to its exact HTTPS origin, a new database password, a matching URL-encoded `DATABASE_URL`, and a backend OpenAI key. Protect this file with host filesystem permissions; never commit or print it. Use your hosting platform's secret store when available.
 3. Start the deployment from the root:
 
@@ -18,7 +18,7 @@ docker compose --env-file .env.production -p inside-agent-prod -f compose.produc
 docker compose --env-file .env.production -p inside-agent-prod -f compose.production.yaml ps
 ```
 
-Use this standalone file, not an override merged with `compose.yaml`, which publishes development database/API ports. On a fresh database, the backend creates the schema and applies migrations transactionally. Existing production volumes receive only unapplied migrations. Never use `down -v` during an update. Rotate an existing PostgreSQL role's password in the database as well as configuration; changing `POSTGRES_PASSWORD` alone does not change an initialized database.
+Use this standalone file, not an override merged with `compose.yaml`, which publishes localhost development database/API ports. On a fresh database, the backend creates the schema and applies migrations transactionally. Existing production volumes receive only unapplied migrations. Never use `down -v` during an update. Rotate an existing PostgreSQL role's password in the database as well as configuration; changing `POSTGRES_PASSWORD` alone does not change an initialized database.
 
 Caddy obtains HTTPS certificates for a reachable domain and preserves them in its data volume ([automatic HTTPS](https://caddyserver.com/docs/automatic-https)). `handle_path /api/*` removes the prefix before proxying to FastAPI; Uvicorn's `/api` root path makes OpenAPI docs work at `/api/docs`. `flush_interval -1` forwards streaming events promptly ([reverse proxy configuration](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy)). The frontend is built with `/api`; changing client configuration requires a rebuild.
 
@@ -26,7 +26,9 @@ Caddy obtains HTTPS certificates for a reachable domain and preserves them in it
 
 The application has no authentication, rate limiting, tenant isolation, or spending cap. Anyone with access to the API can upload documents and cause provider usage; document UUIDs are identifiers, not access controls. Put the whole origin (including `/api` and PDF routes) behind your host's access gateway for a restricted demo. An intentionally open demo needs an agreed usage policy and provider budget controls before launch. Use only the bundled fictional documents for public demonstrations. Original PDFs now persist in PostgreSQL along with extracted text and vectors; include them in your retention and backup policy.
 
-The current environment-file setup keeps secrets out of source/images and the frontend, but host administrators can inspect container environments. For managed environments, prefer their secret injection mechanism; Compose also supports [file-mounted secrets](https://docs.docker.com/compose/how-tos/use-secrets/). This project has not added a secret-file reader to the application.
+Both Compose files use [mounted Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/), sourced from the ignored environment file. Only Postgres receives `postgres_password`; only the backend receives `database_url` and `openai_api_key`; the frontend and proxy receive no secrets. Container environment metadata and resolved Compose configuration contain secret names/file paths instead of credential values. The backend reads files through `app/config.py`, using `DATABASE_URL_FILE` and `OPENAI_API_KEY_FILE`. Postgres uses its native `POSTGRES_PASSWORD_FILE` support. No secret values are passed as build arguments or baked into images.
+
+The host environment file still contains plaintext secrets. Protect it with host permissions and never share it, logs containing credentials, or Docker diagnostics from older containers. Mounted secrets do not hide credentials from host/Docker administrators or code inside an authorized container. Prefer platform-managed secrets in hosted environments. When changing a secret, recreate the affected containers with `up -d --force-recreate` so environment-sourced mounts refresh. Keep existing database passwords aligned with the actual role; this change does not rotate credentials or replace database volumes.
 
 ## Smoke checks after deployment
 

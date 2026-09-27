@@ -17,12 +17,16 @@ from app.embeddings import PREVIEW_SIZE, embedding_summary, process_embeddings
 from app.retrieval import RetrievalRequest, retrieve
 from app.generation import generate_answer
 from app.tracing import Trace, trace_response
+from app.config import read_secret, SecretConfigurationError
 
 MAX_PDF_BYTES = 10 * 1024 * 1024
 
 
 def database_connection() -> psycopg.Connection:
-    database_url = os.getenv("DATABASE_URL")
+    try:
+        database_url = read_secret("DATABASE_URL")
+    except SecretConfigurationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from None
     if not database_url:
         raise HTTPException(status_code=503, detail="DATABASE_URL is not configured")
     try:

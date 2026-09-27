@@ -114,7 +114,7 @@ class GenerationTests(unittest.TestCase):
             with self.provider(fail), self.assertRaises(HTTPException) as error:
                 generate_answer(self.retrieval)
             self.assertNotIn("private-provider-details", error.exception.detail)
-        with patch.dict("os.environ", {"OPENAI_API_KEY": ""}), self.assertRaises(HTTPException) as error:
+        with patch.dict("os.environ", {"OPENAI_API_KEY": "", "OPENAI_API_KEY_FILE": ""}), self.assertRaises(HTTPException) as error:
             generate_answer(self.retrieval)
         self.assertIn("OPENAI_API_KEY", error.exception.detail)
 

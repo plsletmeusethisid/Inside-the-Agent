@@ -212,7 +212,7 @@ class StorageTests(unittest.TestCase):
 
     def test_missing_key_missing_document_and_invalid_id(self):
         document_id = self.document()
-        with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "", "OPENAI_API_KEY_FILE": ""}):
             response = self.client.post(f"/documents/{document_id}/embeddings")
         self.assertEqual(response.status_code, 502)
         self.assertIn("OPENAI_API_KEY", response.json()["detail"])
@@ -332,7 +332,7 @@ class StorageTests(unittest.TestCase):
         self.assertNotIn("private-provider-details", response.text)
         with self.query_provider(lambda request: httpx.Response(200, json={"model": MODEL, "data": []})):
             self.assertEqual(self.client.post(f"/documents/{document_id}/retrieve", json={"question": "VPN?"}).status_code, 502)
-        with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "", "OPENAI_API_KEY_FILE": ""}):
             self.assertEqual(self.client.post(f"/documents/{document_id}/retrieve", json={"question": "VPN?"}).status_code, 502)
         with self.query_provider(self.query_success):
             self.assertEqual(self.client.post(f"/documents/{document_id}/retrieve", json={"question": "VPN?"}).status_code, 200)

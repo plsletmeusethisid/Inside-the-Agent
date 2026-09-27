@@ -72,7 +72,7 @@ class ProviderTests(unittest.TestCase):
             embed_texts(self.client(timeout), ["VPN"])
 
     def test_missing_key_and_blank_text(self):
-        with patch.dict("os.environ", {"OPENAI_API_KEY": ""}):
+        with patch.dict("os.environ", {"OPENAI_API_KEY": "", "OPENAI_API_KEY_FILE": ""}):
             with self.assertRaisesRegex(EmbeddingError, "OPENAI_API_KEY"):
                 create_embedding_client()
         with self.assertRaises(EmbeddingError):

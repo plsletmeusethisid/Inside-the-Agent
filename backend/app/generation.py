@@ -1,7 +1,6 @@
 """One grounded answer call with validated references to retrieved evidence."""
 
 import json
-import os
 from time import perf_counter
 
 import httpx
@@ -9,6 +8,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from typing import Literal
 from app.tracing import Trace
+from app.config import read_secret, SecretConfigurationError
 
 MODEL = "gpt-4.1-mini-2025-04-14"
 NO_ANSWER = "The supplied document context does not contain enough information to answer this question."
@@ -47,7 +47,10 @@ class GenerationError(Exception):
 
 
 def create_generation_client() -> httpx.Client:
-    key = os.getenv("OPENAI_API_KEY", "").strip()
+    try:
+        key = read_secret("OPENAI_API_KEY")
+    except SecretConfigurationError as exc:
+        raise GenerationError(str(exc)) from None
     if not key:
         raise GenerationError("Set OPENAI_API_KEY on the backend, then retry answering.")
     return httpx.Client(

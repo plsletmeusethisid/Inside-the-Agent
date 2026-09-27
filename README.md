@@ -1,6 +1,6 @@
 # Inside the Agent
 
-An interactive document QA pipeline demo. Upload a PDF to inspect its extracted page text and token chunks, generate real OpenAI embeddings, and persist them in pgvector. Ask a question to inspect its query embedding, ranked chunks, and a grounded LLM answer with clickable evidence. Retrieval-only inspection is also available.
+An interactive document QA pipeline demo. Upload a PDF to inspect its extracted page text and token chunks, generate real OpenAI embeddings, and persist them in pgvector. Watch real execution events over SSE as the document is processed and a question moves through query embedding, retrieval, and a streaming answer with clickable evidence. Retrieval-only inspection is also available.
 
 ## Start with Docker Compose
 
@@ -46,6 +46,8 @@ When running Python outside Docker, set `OPENAI_API_KEY` in that process's envir
 - `backend/app/database.py`: transactional schema and migration runner.
 - `backend/app/retrieval.py`: validated questions, shared query embeddings, and document-scoped cosine search.
 - `backend/app/generation.py`: fixed system prompt, structured answers, and evidence validation.
+- `backend/app/tracing.py`: request-local events, bounded SSE transport, and cooperative disconnect handling.
+- `frontend/lib/trace-stream.ts` and `components/execution-trace.tsx`: POST stream consumption and measured execution states.
 - `frontend/components/retrieval-workbench.tsx`: question entry, query vector preview, ranked passages, and source navigation.
 - `backend/sql/init.sql`: pgvector extension and document, page, and chunk tables.
 - `backend/sql/migrations/002_chunk_embeddings.sql`: additive embedding columns and processing metadata.
@@ -70,7 +72,7 @@ The UI shows pending, processing, failed, and embedded states. The progress bar 
 
 Processing uses batches of up to 32 chunks with a 10-second connection timeout and a 60-second HTTP operation timeout. Each batch commits atomically. Completed batches survive later provider errors or API restarts; **Retry remaining chunks** only embeds chunks without vectors. Repeating a completed request does not call OpenAI or rewrite vectors. A request interrupted after OpenAI responds but before the database commit can incur duplicate provider usage on retry.
 
-One PostgreSQL advisory lock per document prevents concurrent embedding requests (`409`). A dropped connection releases the lock; inspection reports an interrupted job and offers a retry. The API handles processing in a synchronous worker for the duration of the request; there is no queue or durable background worker. The UI polls saved counts and chunks every second while processing. Leaving the page stops browser requests, but backend processing may finish; reopening the document shows saved progress. Large documents may exceed an external reverse proxy's request timeout; reopen and retry if necessary.
+One PostgreSQL advisory lock per document prevents concurrent embedding requests (`409`). A dropped database connection releases the lock; inspection reports an interrupted job and offers a retry. The API handles processing in a synchronous worker for the duration of the request; there is no durable background worker. The UI receives committed counts over SSE and refreshes chunk previews at completion. It polls saved counts only when reopening an active job or waiting for a cancelled worker to finish. Leaving the page cancels the browser stream and requests cooperative server cancellation; reopening the document shows saved progress. Large documents may exceed an external reverse proxy's request timeout; reopen and retry if necessary.
 
 ## Storage and API
 
@@ -110,7 +112,7 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:8000/documents/$documentId
 
 Response fields: `document_id`, trimmed `question`, `k`, `min_similarity`, `searched_chunks`, `model`, `dimensions`, `query_embedding_preview` (first three values), `score_definition`, `timings_ms` (`query_embedding`, `vector_search`), and `results`. Each result has `rank`, `chunk_id`, `chunk_index`, `page_number`, `content`, `token_count`, and `similarity`. Empty results still include the query preview and timings. Full question vectors are neither returned nor stored. Searches do not change stored document vectors.
 
-Questions must contain non-whitespace text and be at most 2,000 characters; k must be an integer from 1–20, and the minimum must be finite and between −1 and 1. Invalid inputs return `422`, absent documents `404`, incomplete or incompatible chunk embeddings `409`, provider failures `502`, and database failures `503`. Incomplete documents are rejected before calling OpenAI. Question embedding uses the existing provider timeouts and safe errors. Requests are synchronous; the UI reports a combined pending state and shows stage measurements only after a successful response. Cancelling or leaving stops browser requests, but the backend/provider may finish and incur usage. No live stage stream or LLM call is involved.
+Questions must contain non-whitespace text and be at most 2,000 characters; k must be an integer from 1–20, and the minimum must be finite and between −1 and 1. Invalid inputs return `422`, absent documents `404`, incomplete or incompatible chunk embeddings `409`, provider failures `502`, and database failures `503`. Incomplete documents are rejected before calling OpenAI. Question embedding uses the existing provider timeouts and safe errors. The JSON endpoint returns once retrieval finishes; the UI uses its SSE counterpart to display completed query embeddings and ranked evidence progressively. Retrieval-only mode does not call the generation model.
 
 ## Answer from retrieved evidence
 
@@ -141,7 +143,49 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:8000/documents/$documentId
 
 If retrieval returns no chunks, generation is skipped and the response is `insufficient_evidence`, with no citations and zero generation duration. This describes the supplied context, not proof about the entire document. If the model reports insufficient evidence, the same clear admission replaces its answer text. Provider errors, refusals, unfinished output, malformed output, and invalid citations return safe `502` errors rather than being presented as missing evidence. Retrieval's `404`, `409`, `422`, and `503` behavior also applies.
 
-The UI shows the answer with clickable evidence and the exact context beneath it, rendered as text. Requests are synchronous; no intermediate live stages are simulated. Cancellation or navigation stops browser requests, but backend/provider work may finish and incur usage. Answers and questions are not persisted by this app. No live trace stream has been added.
+The UI shows the answer with clickable evidence and the exact context beneath it, rendered as text. Its SSE request shows real stages and provisional answer text as they arrive. The final answer still requires the same structured-output and citation checks as the JSON endpoint. Answers, questions, and execution traces are not persisted by this app.
+
+## Live execution traces
+
+The existing JSON endpoints remain available. The UI uses these additional **POST** endpoints with the same inputs:
+
+| Endpoint | Stream |
+| --- | --- |
+| `/documents/stream` | Multipart upload → parse → chunk → save extracted pages/chunks. |
+| `/documents/{id}/embeddings/stream` | Explicit embedding action → batch provider requests → committed vectors. |
+| `/documents/{id}/retrieve/stream` | Question → query embedding → ranked chunks. |
+| `/documents/{id}/answer/stream` | Question → query embedding → retrieval → exact context → streamed answer → validated result. |
+
+Responses use `text/event-stream`, `Cache-Control: no-cache, no-transform`, and `X-Accel-Buffering: no`. The browser consumes a streaming `fetch` POST, since native `EventSource` cannot send these request bodies. Each frame contains an SSE `id` (`run_id:sequence`), named `event`, and JSON `data` envelope:
+
+```json
+{
+  "event": "parse_completed",
+  "run_id": "request UUID",
+  "sequence": 3,
+  "document_id": "document UUID",
+  "timestamp": "UTC ISO timestamp",
+  "elapsed_ms": 14.8,
+  "data": { "duration_ms": 12.1, "page_count": 3 }
+}
+```
+
+Numbers above illustrate the contract; the UI displays actual measurements. Every new request gets a fresh run UUID. Document IDs are assigned before parsing; a failed or cancelled upload may never save that document. Sequence numbers are ordered within one run. Heartbeat comments keep otherwise idle streams active every 10 seconds. Traces are not replayable, and `Last-Event-ID` resume is unsupported. Reconnection never automatically repeats a paid call or upload.
+
+Events include all of `parse_started`, `parse_completed`, `chunking_started`, `chunking_completed`, `embedding_started`, `embedding_completed`, `retrieval_started`, `retrieval_completed`, `generation_started`, `token`, and `generation_completed`. Additional events expose the actual pipeline boundaries:
+
+- `trace_started` and `question` identify the run/input.
+- `query_embedding_started/completed` distinguish question embedding from document embedding. Completion includes the real vector preview, model, and dimensions.
+- `storage_started/progress/completed` distinguish generated vectors from committed data. Upload storage saves extracted text; embedding storage saves vectors. Embedding batches also emit `embedding_progress`. Embedding and storage overlap across batches; their durations sum measured provider and vector-commit work respectively. Already stored vectors are skipped on retry.
+- `context_selected` contains exactly the chunk IDs, indices, pages, and text passed to generation. Retrieval completion includes measured scores and ranked text, so evidence can be inspected while generation runs.
+- `embedding_skipped`, `storage_skipped`, and `generation_skipped` explicitly report work not performed. A completed embedding retry avoids the provider; empty retrieval skips generation.
+- `completed` carries the same final `result` as the corresponding JSON endpoint. A run ends with either this event or `error`, never both. Safe errors carry `stage`, `message`, and `status_code`. Once SSE headers have been sent, HTTP status remains 200; consumers must handle the terminal event. Input validation and upload size/type errors before streaming retain normal HTTP error statuses.
+
+Generation uses the same fixed model, prompt, schema, and timeouts with [`stream: true` in Responses](https://developers.openai.com/api/docs/guides/streaming-responses). `token` carries decoded **answer-text fragments** derived from actual `response.output_text.delta` events, not necessarily individual tokenizer tokens. JSON syntax and evidence-ID fragments are withheld. Split escapes and Unicode are decoded before display. The UI labels text as a draft until the completed response passes validation. Invalid citations, refusals, truncated streams, and provider failures clear the draft and mark the run failed. Insufficient evidence replaces any draft with the standard no-answer message.
+
+Each stream uses a synchronous pipeline worker and a bounded 64-event buffer. The event loop remains available for other requests. Backpressure prevents unlimited event buffering. Cancelling or navigating away closes the browser reader and signals the worker to stop at the next event/provider-stream boundary. Context managers close provider responses, database connections, and advisory locks. A blocking parse, provider read, or database commit cannot be forcibly interrupted by this mechanism; it may finish first, incur usage, or persist data. Successful embedding batches remain saved. Cancellation is not a rollback, and a job can temporarily remain `processing` until the worker releases its lock.
+
+The trace shows completion only after real work finishes, errors on the failing stage, and stopped/unstarted states for unfinished work. Animations only indicate active stages and honor reduced-motion settings. Server event details are expandable by keyboard. Reload shows saved data, not a reconstructed execution history. No credentials, system prompts, provider bodies, or arbitrary exception details are included; retrieved document text is intentionally visible as evidence. No database migration, new provider, or new environment variable is required. Reverse proxies must disable response buffering and allow the request duration; deployment-specific proxy behavior has not been verified.
 
 ## Verification
 
@@ -155,6 +199,7 @@ docker compose run --rm --no-deps -v ./backend/tests:/app/tests:ro backend pytho
 docker compose run --rm --no-deps -v ./backend/tests:/app/tests:ro backend python -c "import os, sys, unittest; os.environ['TEST_DATABASE_URL'] = os.environ['DATABASE_URL']; result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.discover('tests')); sys.exit(not result.wasSuccessful())"
 docker compose exec -T frontend npm run lint
 docker compose exec -T frontend npm run typecheck
+docker compose exec -T frontend npm test
 ```
 
 Locally, install backend dependencies and run `python -m unittest discover -s tests` from `backend/`. Set `TEST_DATABASE_URL` to enable the integration tests. They create and remove only a uniquely named `test_embeddings_...` schema. Provider responses are fixtures in automated tests; these tests do not measure semantic quality or spend API credits.
@@ -179,4 +224,19 @@ To repeat the answer smoke manually: upload/embed the bundled example with the s
 
 ## Remaining milestones
 
-Execution traces and a versioned retrieval/grounding evaluation set remain future work. The current milestone includes grounded answers with validated source references. The fixed role is document question answering; no autonomous tool loop is planned for this initial demo. OCR, original-PDF coordinates, authentication, and public multiuser hosting remain outside this milestone.
+The current milestone includes live execution traces and streaming grounded answers with validated source references. A versioned retrieval/grounding evaluation set remains future work. The fixed role is document question answering; no autonomous tool loop is planned for this initial demo. OCR, original-PDF coordinates, authentication, and public multiuser hosting remain outside this milestone.
+
+## Trace verification
+
+Verified on 2026-09-27: **43 backend tests** passed with real tiktoken/pgvector, including event delivery before completion, stable identifiers/order, provider streaming, split JSON escapes/Unicode, truncated streams, invalid citations, safe errors, and disconnect cleanup. A cancellation after one committed batch retained 32 of 33 vectors, released the lock, and resumed the final chunk. Final review fixed a worker's reentrant advisory-lock probe incorrectly reporting its own progress as interrupted; the suite passed with an assertion for the correct processing state. **Three frontend stream-parser tests**, frontend lint, typecheck, and the production Docker build passed. Parser tests cover byte-split UTF-8, CRLF/heartbeats, terminal errors, premature EOF, ordering, and abort cleanup.
+
+The Edge browser smoke confirmed actual SSE upload and embedding of the bundled five-chunk example, live running states, evidence visible before generation completion, and progressive draft text. VPN returned 50 answer-text fragments and cited chunk 2/page 2; password reset returned 61 fragments and cited chunks 4–5/page 3. These fragment counts are observed outputs, not required or deterministic counts. Unrelated questions returned insufficient evidence, and a cutoff of 1 skipped generation. Citation highlighting, retrieval-only mode, fixture provider-error display, cancellation without stale output, unchanged stored vectors, reload without invented trace history, and 390px overflow checks passed with no page errors. The first smoke attempt hit a DevTools response-body retrieval limitation; capturing the stream in-page fixed the test. Provider fixtures verify contracts; these real questions are smoke evidence, not a grounding evaluation. The pre-existing non-failing TestClient/httpx deprecation warning remains.
+
+Reproduce the browser smoke from the root with the services running, a configured backend key, Node.js, and Microsoft Edge installed (uses paid OpenAI calls and saves a new bundled example document):
+
+```powershell
+npm install --prefix .verification --no-save playwright-core
+node scripts/trace-smoke.cjs
+```
+
+Screenshots are written to the ignored `.verification/trace-desktop.png` and `trace-mobile.png`. To inspect the flow manually, upload the example at 50 tokens/10 overlap, embed it, ask a VPN question, and expand **Inspect server events**. Cancel during a run to check that unfinished stages are not marked complete.

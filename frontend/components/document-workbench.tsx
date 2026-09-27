@@ -2,6 +2,8 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { RetrievalWorkbench } from "./retrieval-workbench";
+import { ExecutionTrace } from "./execution-trace";
+import { appendTrace, traceRequest, TraceEvent, TraceStatus } from "@/lib/trace-stream";
 
 type Page = { number: number; content: string };
 type Chunk = {
@@ -60,15 +62,21 @@ export function DocumentWorkbench() {
   const [embedding, setEmbedding] = useState<EmbeddingSummary | null>(null);
   const [embeddingBusy, setEmbeddingBusy] = useState(false);
   const [embeddingError, setEmbeddingError] = useState<string | null>(null);
+  const [uploadEvents, setUploadEvents] = useState<TraceEvent[]>([]);
+  const [uploadStatus, setUploadStatus] = useState<TraceStatus>("idle");
+  const [embeddingEvents, setEmbeddingEvents] = useState<TraceEvent[]>([]);
+  const [embeddingTraceStatus, setEmbeddingTraceStatus] = useState<TraceStatus>("idle");
+  const uploadRequest = useRef<AbortController | null>(null);
   const embeddingRequest = useRef<AbortController | null>(null);
   const sourcePanel = useRef<HTMLDivElement | null>(null);
   const documentId = document?.id;
   const processing = embeddingBusy || embedding?.status === "processing";
 
-  useEffect(() => () => embeddingRequest.current?.abort(), []);
+  useEffect(() => () => { embeddingRequest.current?.abort(); uploadRequest.current?.abort(); }, []);
 
   useEffect(() => {
-    if (!documentId || !processing) return;
+    // Only poll a saved/reopened job. Our own request receives committed counts via SSE.
+    if (!documentId || !processing || embeddingBusy) return;
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
     async function poll() {
@@ -90,13 +98,14 @@ export function DocumentWorkbench() {
     }
     timer = setTimeout(poll, 1000);
     return () => { controller.abort(); clearTimeout(timer); };
-  }, [documentId, processing]);
+  }, [documentId, processing, embeddingBusy]);
 
   function showDocument({ doc, chunkData, progress }: Awaited<ReturnType<typeof fetchDocument>>) {
     setDocument(doc);
     setChunks(chunkData.chunks);
     setEmbedding(progress);
     setEmbeddingError(null);
+    setEmbeddingEvents([]); setEmbeddingTraceStatus("idle");
     setSize(doc.chunk_size);
     setOverlap(doc.chunk_overlap);
     setSelectedIndex(0);
@@ -110,10 +119,16 @@ export function DocumentWorkbench() {
     embeddingRequest.current = controller;
     setEmbeddingBusy(true);
     setEmbeddingError(null);
+    setEmbeddingEvents([]); setEmbeddingTraceStatus("running");
     try {
-      const progress = await readJson<EmbeddingSummary>(await fetch(`${api}/documents/${documentId}/embeddings`, { method: "POST", signal: controller.signal }));
-      if (!controller.signal.aborted) setEmbedding(progress);
+      const progress = await traceRequest<EmbeddingSummary>(`${api}/documents/${documentId}/embeddings/stream`, { method: "POST", signal: controller.signal }, (event) => {
+        if (controller.signal.aborted) return;
+        setEmbeddingEvents(current => appendTrace(current, event));
+        if (event.event === "storage_progress" || event.event === "storage_completed") setEmbedding(event.data as unknown as EmbeddingSummary);
+      });
+      if (!controller.signal.aborted) { setEmbedding(progress); setEmbeddingTraceStatus("complete"); }
     } catch (reason) {
+      if (!controller.signal.aborted) setEmbeddingTraceStatus("failed");
       if (!controller.signal.aborted) setEmbeddingError(reason instanceof Error ? reason.message : "Embedding failed");
     } finally {
       if (!controller.signal.aborted) {
@@ -151,18 +166,28 @@ export function DocumentWorkbench() {
     if (!file) return;
     setBusy(true);
     setError(null);
+    const controller = new AbortController();
+    uploadRequest.current = controller;
+    setUploadEvents([]); setUploadStatus("running");
     try {
       const form = new FormData();
       form.append("file", file);
       form.append("chunk_size", String(size));
       form.append("chunk_overlap", String(overlap));
-      const result = await readJson<UploadResult>(await fetch(`${api}/documents`, { method: "POST", body: form }));
-      showDocument(await fetchDocument(result.id));
+      const result = await traceRequest<UploadResult>(`${api}/documents/stream`, { method: "POST", body: form, signal: controller.signal }, (event) => {
+        if (!controller.signal.aborted) setUploadEvents(current => appendTrace(current, event));
+      });
+      if (controller.signal.aborted) return;
+      setUploadStatus("complete");
+      window.history.replaceState(null, "", `?document=${result.id}`);
+      const loaded = await fetchDocument(result.id, controller.signal);
+      if (controller.signal.aborted) return;
+      showDocument(loaded);
       window.history.replaceState(null, "", `?document=${result.id}`);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Upload failed");
+      if (!controller.signal.aborted) { setUploadStatus(current => current === "complete" ? current : "failed"); setError(reason instanceof Error ? reason.message : "Upload failed"); }
     } finally {
-      setBusy(false);
+      if (!controller.signal.aborted) setBusy(false);
     }
   }
 
@@ -191,14 +216,28 @@ export function DocumentWorkbench() {
           </div>
           <button className="primary-button" type="submit" disabled={busy || processing || !file || overlap >= size}>{busy ? "Processing document…" : "Parse & inspect chunks →"}</button>
           {error && <p className="lab-error" role="alert">{error}</p>}
+          {busy && <button className="cancel-search" type="button" onClick={() => {
+            uploadRequest.current?.abort(); setBusy(false); setUploadStatus("cancelled");
+            setError("Upload cancelled. A database commit already in progress may still finish.");
+          }}>Cancel upload</button>}
+          <ExecutionTrace title="Document execution" events={uploadEvents} status={uploadStatus}
+            stages={[["parse", "Parse"], ["chunking", "Chunk"], ["storage", "Save pages & chunks"]]} />
+          {document && !uploadEvents.length && <p>Saved document loaded. Past execution events are not replayed.</p>}
           {document && <div className="lab-summary"><strong>{document.filename}</strong><span>{document.page_count} pages · {chunks.length} chunks</span><span>{document.chunk_size} token limit · {document.chunk_overlap} token overlap</span></div>}
           {document && embedding && <div className="embedding-panel">
             <h3>Embed & store</h3>
             <p>Send this document’s chunks to OpenAI to generate embeddings, then store the full vectors in pgvector.</p>
             <span className="embedding-model">{embedding.model} · {embedding.dimensions.toLocaleString()} dimensions</span>
+            <ExecutionTrace title="Embedding execution" events={embeddingEvents} status={embeddingTraceStatus}
+              stages={[["embedding", "Embed"], ["storage", "Store vectors"]]} />
             <button className="primary-button" type="button" onClick={handleEmbedding} disabled={busy || processing || embedding.status === "complete"}>
               {processing ? "Embedding & storing…" : embedding.status === "complete" ? "All embeddings stored ✓" : embedding.status === "failed" || embedding.status === "interrupted" ? "Retry remaining chunks →" : "Embed & store chunks →"}
             </button>
+            {embeddingBusy && <button className="cancel-search" type="button" onClick={() => {
+              embeddingRequest.current?.abort(); setEmbeddingBusy(false); setEmbeddingTraceStatus("cancelled");
+              setEmbedding(current => current ? { ...current, status: "processing" } : null);
+              setEmbeddingError("Cancellation requested. Checking saved progress while the server releases this run.");
+            }}>Cancel embedding</button>}
             <div className="embedding-progress" role="status" aria-live="polite">
               <strong>{embedding.status === "complete" ? `${embedding.embedded_chunks} chunks embedded and stored.` : `${embedding.embedded_chunks} of ${embedding.total_chunks} chunks embedded and stored.`}</strong>
               <progress aria-label="Chunks embedded and stored" value={embedding.embedded_chunks} max={Math.max(1, embedding.total_chunks)} />

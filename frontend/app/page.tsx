@@ -46,7 +46,7 @@ export default function Home() {
           <div className="pipeline-column">
             <div className="column-heading"><span className="mini-dot green" /> INFERENCE <span className="heading-side">QUESTION → ANSWER</span></div>
             {answering.map((stage) => <div className="stage" key={stage.number}><span className="stage-number">{stage.number}</span><div><h3>{stage.name}</h3><p>{stage.description}</p></div><span className="stage-arrow">↗</span></div>)}
-            <div className="trace-note"><span>✳</span><span>Execution traces will show each step and the evidence behind an answer.</span></div>
+            <div className="trace-note"><span>✳</span><span>Live execution traces show real steps, measured timings, and the evidence behind an answer.</span></div>
           </div>
         </div>
       </section>

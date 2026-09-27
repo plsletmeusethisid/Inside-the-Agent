@@ -1,0 +1,1775 @@
+{
+  "fixture_version": "harbor-handbook-v1",
+  "started_at": "2026-09-27T07:04:09.625553+00:00",
+  "dataset_sha256": "8d5f4e9a93b35d8b6861c708aa1decdbd41987340c682d2c2e9bdc94c2f57564",
+  "pdf_sha256": "ee78029beca27b377e2f408e8404e31b265c064686092305b99c1872244199a2",
+  "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+  "chunk_count": 12,
+  "chunk_size": 120,
+  "chunk_overlap": 20,
+  "k": 3,
+  "min_similarity": -1,
+  "embedding_model": "text-embedding-3-small",
+  "embedding_dimensions": 1536,
+  "mode": "answer",
+  "cases": [
+    {
+      "id": "vpn-login",
+      "kind": "answerable",
+      "question": "Which VPN gateway should I choose, and how do I approve the login?",
+      "expected": [
+        {
+          "section": "remote-access",
+          "page": 1,
+          "anchor": "choose the studio.harbor.example gateway"
+        },
+        {
+          "section": "remote-access",
+          "page": 1,
+          "anchor": "Approve the sign-in using the AuthKey app"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 3,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "Which VPN gateway should I choose, and how do I approve the login?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          -0.045440673828125,
+          0.019378662109375,
+          0.02496337890625
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 1146.49,
+          "vector_search": 4.06
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1,
+            "content": "disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17 persists, send the error code and time to helpdesk@harbor.example. Never send passwords or AuthKey codes to support. Personal laptops cannot connect to the studio VPN. The helpdesk cannot grant an exception to this device rule. harbor-handbook-v1 | Page 1 | Fictional demo data",
+            "token_count": 81,
+            "similarity": 0.3776277496382414
+          },
+          {
+            "rank": 2,
+            "chunk_id": "169fe4d8-9010-438c-9346-f0b67279d98c",
+            "chunk_index": 3,
+            "page_number": 2,
+            "content": "your identity by a scheduled video call before enrolling a replacement device. A password reset alone does not replace an AuthKey device. Never approve an unexpected authentication request. Report unexpected prompts to security@harbor.example, even if you did not approve them. harbor-handbook-v1 | Page 2 | Fictional demo data",
+            "token_count": 65,
+            "similarity": 0.3527988117796528
+          },
+          {
+            "rank": 3,
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17",
+            "token_count": 120,
+            "similarity": 0.32972687044560156
+          }
+        ],
+        "answer": "You should choose the studio.harbor.example gateway in the HarborLink VPN client. To approve the login, sign in with your work email and approve the sign-in using the AuthKey app.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+          "a974fbfe-5dbb-44b3-a2c8-2907d8f00038"
+        ],
+        "citations": [
+          {
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1
+          },
+          {
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1,
+            "content": "disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17 persists, send the error code and time to helpdesk@harbor.example. Never send passwords or AuthKey codes to support. Personal laptops cannot connect to the studio VPN. The helpdesk cannot grant an exception to this device rule. harbor-handbook-v1 | Page 1 | Fictional demo data"
+          },
+          {
+            "chunk_id": "169fe4d8-9010-438c-9346-f0b67279d98c",
+            "chunk_index": 3,
+            "page_number": 2,
+            "content": "your identity by a scheduled video call before enrolling a replacement device. A password reset alone does not replace an AuthKey device. Never approve an unexpected authentication request. Report unexpected prompts to security@harbor.example, even if you did not approve them. harbor-handbook-v1 | Page 2 | Fictional demo data"
+          },
+          {
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1745.97
+        }
+      }
+    },
+    {
+      "id": "vpn-h17",
+      "kind": "answerable",
+      "question": "What should I try when HarborLink shows H17?",
+      "expected": [
+        {
+          "section": "remote-access",
+          "page": 1,
+          "anchor": "check that the laptop clock is set automatically"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "What should I try when HarborLink shows H17?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          -0.0556640625,
+          -0.029205322265625,
+          0.03564453125
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 188.68,
+          "vector_search": 4.07
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17",
+            "token_count": 120,
+            "similarity": 0.5202683476640014
+          },
+          {
+            "rank": 2,
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1,
+            "content": "disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17 persists, send the error code and time to helpdesk@harbor.example. Never send passwords or AuthKey codes to support. Personal laptops cannot connect to the studio VPN. The helpdesk cannot grant an exception to this device rule. harbor-handbook-v1 | Page 1 | Fictional demo data",
+            "token_count": 81,
+            "similarity": 0.4933628121260807
+          },
+          {
+            "rank": 3,
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2,
+            "content": "Harbor Studio - Fictional Employee Handbook 2. Account recovery To reset a forgotten work password, open accounts.harbor.example and select Recover account. Enter your work email and use the recovery link sent to your registered backup email. The recovery link expires after 20 minutes. A new password must contain at least 14 characters. Changing a password signs out existing browser sessions; sign in again after the reset. If your AuthKey phone is lost, call the helpdesk at extension 410. Support verifies your identity by a scheduled video call before enrolling a replacement device. A password reset alone does",
+            "token_count": 120,
+            "similarity": 0.39464264785632674
+          }
+        ],
+        "answer": "When HarborLink shows error H17, you should disconnect the client, check that the laptop clock is set to update automatically, and then reconnect once. If the H17 error persists, you should send the error code and time to helpdesk@harbor.example, but never send passwords or AuthKey codes to support.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+          "a974fbfe-5dbb-44b3-a2c8-2907d8f00038"
+        ],
+        "citations": [
+          {
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1
+          },
+          {
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17"
+          },
+          {
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1,
+            "content": "disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17 persists, send the error code and time to helpdesk@harbor.example. Never send passwords or AuthKey codes to support. Personal laptops cannot connect to the studio VPN. The helpdesk cannot grant an exception to this device rule. harbor-handbook-v1 | Page 1 | Fictional demo data"
+          },
+          {
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2,
+            "content": "Harbor Studio - Fictional Employee Handbook 2. Account recovery To reset a forgotten work password, open accounts.harbor.example and select Recover account. Enter your work email and use the recovery link sent to your registered backup email. The recovery link expires after 20 minutes. A new password must contain at least 14 characters. Changing a password signs out existing browser sessions; sign in again after the reset. If your AuthKey phone is lost, call the helpdesk at extension 410. Support verifies your identity by a scheduled video call before enrolling a replacement device. A password reset alone does"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1515.87
+        }
+      }
+    },
+    {
+      "id": "personal-laptop",
+      "kind": "answerable",
+      "question": "Can support make an exception so I can use my personal laptop on the VPN?",
+      "expected": [
+        {
+          "section": "remote-access",
+          "page": 1,
+          "anchor": "Personal laptops cannot connect to the studio VPN"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "Can support make an exception so I can use my personal laptop on the VPN?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          -0.01165771484375,
+          -0.005870819091796875,
+          0.007717132568359375
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 599.71,
+          "vector_search": 3.84
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1,
+            "content": "disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17 persists, send the error code and time to helpdesk@harbor.example. Never send passwords or AuthKey codes to support. Personal laptops cannot connect to the studio VPN. The helpdesk cannot grant an exception to this device rule. harbor-handbook-v1 | Page 1 | Fictional demo data",
+            "token_count": 81,
+            "similarity": 0.5192051492568249
+          },
+          {
+            "rank": 2,
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17",
+            "token_count": 120,
+            "similarity": 0.34820860117869123
+          },
+          {
+            "rank": 3,
+            "chunk_id": "7757a5f6-37cc-45d1-b93b-579adc667d4c",
+            "chunk_index": 9,
+            "page_number": 5,
+            "content": "If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911. Preserve the message for the security team. Reporting a suspicious email does not require proof that an attack succeeded. These security steps take priority over routine equipment repair requests. harbor-handbook-v1 | Page 5 | Fictional demo data",
+            "token_count": 65,
+            "similarity": 0.3479137679083908
+          }
+        ],
+        "answer": "No, support cannot make an exception to allow use of a personal laptop on the VPN. Personal laptops are not allowed to connect to the studio VPN, and the helpdesk cannot grant exceptions to this device rule.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "a974fbfe-5dbb-44b3-a2c8-2907d8f00038"
+        ],
+        "citations": [
+          {
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1,
+            "content": "disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17 persists, send the error code and time to helpdesk@harbor.example. Never send passwords or AuthKey codes to support. Personal laptops cannot connect to the studio VPN. The helpdesk cannot grant an exception to this device rule. harbor-handbook-v1 | Page 1 | Fictional demo data"
+          },
+          {
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17"
+          },
+          {
+            "chunk_id": "7757a5f6-37cc-45d1-b93b-579adc667d4c",
+            "chunk_index": 9,
+            "page_number": 5,
+            "content": "If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911. Preserve the message for the security team. Reporting a suspicious email does not require proof that an attack succeeded. These security steps take priority over routine equipment repair requests. harbor-handbook-v1 | Page 5 | Fictional demo data"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1428.26
+        }
+      }
+    },
+    {
+      "id": "recovery-expiry",
+      "kind": "answerable",
+      "question": "How long does my password recovery link last?",
+      "expected": [
+        {
+          "section": "account-recovery",
+          "page": 2,
+          "anchor": "The recovery link expires after 20 minutes"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "How long does my password recovery link last?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          0.00408935546875,
+          -0.01439666748046875,
+          0.005184173583984375
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 226.71,
+          "vector_search": 3.7
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2,
+            "content": "Harbor Studio - Fictional Employee Handbook 2. Account recovery To reset a forgotten work password, open accounts.harbor.example and select Recover account. Enter your work email and use the recovery link sent to your registered backup email. The recovery link expires after 20 minutes. A new password must contain at least 14 characters. Changing a password signs out existing browser sessions; sign in again after the reset. If your AuthKey phone is lost, call the helpdesk at extension 410. Support verifies your identity by a scheduled video call before enrolling a replacement device. A password reset alone does",
+            "token_count": 120,
+            "similarity": 0.4745323515674522
+          },
+          {
+            "rank": 2,
+            "chunk_id": "169fe4d8-9010-438c-9346-f0b67279d98c",
+            "chunk_index": 3,
+            "page_number": 2,
+            "content": "your identity by a scheduled video call before enrolling a replacement device. A password reset alone does not replace an AuthKey device. Never approve an unexpected authentication request. Report unexpected prompts to security@harbor.example, even if you did not approve them. harbor-handbook-v1 | Page 2 | Fictional demo data",
+            "token_count": 65,
+            "similarity": 0.3745748891978329
+          },
+          {
+            "rank": 3,
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911.",
+            "token_count": 120,
+            "similarity": 0.30930030222402094
+          }
+        ],
+        "answer": "The password recovery link lasts for 20 minutes before it expires.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "8e10d5f5-26fb-4f51-b827-dd85f5d91940"
+        ],
+        "citations": [
+          {
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2,
+            "content": "Harbor Studio - Fictional Employee Handbook 2. Account recovery To reset a forgotten work password, open accounts.harbor.example and select Recover account. Enter your work email and use the recovery link sent to your registered backup email. The recovery link expires after 20 minutes. A new password must contain at least 14 characters. Changing a password signs out existing browser sessions; sign in again after the reset. If your AuthKey phone is lost, call the helpdesk at extension 410. Support verifies your identity by a scheduled video call before enrolling a replacement device. A password reset alone does"
+          },
+          {
+            "chunk_id": "169fe4d8-9010-438c-9346-f0b67279d98c",
+            "chunk_index": 3,
+            "page_number": 2,
+            "content": "your identity by a scheduled video call before enrolling a replacement device. A password reset alone does not replace an AuthKey device. Never approve an unexpected authentication request. Report unexpected prompts to security@harbor.example, even if you did not approve them. harbor-handbook-v1 | Page 2 | Fictional demo data"
+          },
+          {
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911."
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 815.96
+        }
+      }
+    },
+    {
+      "id": "lost-authkey",
+      "kind": "answerable",
+      "question": "I lost my AuthKey phone. Who do I contact and how will they verify me?",
+      "expected": [
+        {
+          "section": "account-recovery",
+          "page": 2,
+          "anchor": "call the helpdesk at extension 410"
+        },
+        {
+          "section": "account-recovery",
+          "page": 2,
+          "anchor": "scheduled video call"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "I lost my AuthKey phone. Who do I contact and how will they verify me?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          0.036834716796875,
+          0.0148773193359375,
+          -0.0245361328125
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 178.41,
+          "vector_search": 4.62
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "169fe4d8-9010-438c-9346-f0b67279d98c",
+            "chunk_index": 3,
+            "page_number": 2,
+            "content": "your identity by a scheduled video call before enrolling a replacement device. A password reset alone does not replace an AuthKey device. Never approve an unexpected authentication request. Report unexpected prompts to security@harbor.example, even if you did not approve them. harbor-handbook-v1 | Page 2 | Fictional demo data",
+            "token_count": 65,
+            "similarity": 0.5264641831913002
+          },
+          {
+            "rank": 2,
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2,
+            "content": "Harbor Studio - Fictional Employee Handbook 2. Account recovery To reset a forgotten work password, open accounts.harbor.example and select Recover account. Enter your work email and use the recovery link sent to your registered backup email. The recovery link expires after 20 minutes. A new password must contain at least 14 characters. Changing a password signs out existing browser sessions; sign in again after the reset. If your AuthKey phone is lost, call the helpdesk at extension 410. Support verifies your identity by a scheduled video call before enrolling a replacement device. A password reset alone does",
+            "token_count": 120,
+            "similarity": 0.4438667046182988
+          },
+          {
+            "rank": 3,
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911.",
+            "token_count": 120,
+            "similarity": 0.3487240772201319
+          }
+        ],
+        "answer": "If you lose your AuthKey phone, you should call the helpdesk at extension 410. The support team will verify your identity by a scheduled video call before enrolling a replacement device.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+          "169fe4d8-9010-438c-9346-f0b67279d98c"
+        ],
+        "citations": [
+          {
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2
+          },
+          {
+            "chunk_id": "169fe4d8-9010-438c-9346-f0b67279d98c",
+            "chunk_index": 3,
+            "page_number": 2
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "169fe4d8-9010-438c-9346-f0b67279d98c",
+            "chunk_index": 3,
+            "page_number": 2,
+            "content": "your identity by a scheduled video call before enrolling a replacement device. A password reset alone does not replace an AuthKey device. Never approve an unexpected authentication request. Report unexpected prompts to security@harbor.example, even if you did not approve them. harbor-handbook-v1 | Page 2 | Fictional demo data"
+          },
+          {
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2,
+            "content": "Harbor Studio - Fictional Employee Handbook 2. Account recovery To reset a forgotten work password, open accounts.harbor.example and select Recover account. Enter your work email and use the recovery link sent to your registered backup email. The recovery link expires after 20 minutes. A new password must contain at least 14 characters. Changing a password signs out existing browser sessions; sign in again after the reset. If your AuthKey phone is lost, call the helpdesk at extension 410. Support verifies your identity by a scheduled video call before enrolling a replacement device. A password reset alone does"
+          },
+          {
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911."
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1424.71
+        }
+      }
+    },
+    {
+      "id": "monitor-budget",
+      "kind": "answerable",
+      "question": "What is the monitor allowance and whose approval do I need?",
+      "expected": [
+        {
+          "section": "equipment",
+          "page": 3,
+          "anchor": "The monitor allowance is 280 credits"
+        },
+        {
+          "section": "equipment",
+          "page": 3,
+          "anchor": "team lead's approval before ordering"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "What is the monitor allowance and whose approval do I need?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          0.01319122314453125,
+          0.031829833984375,
+          0.0226287841796875
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 199.88,
+          "vector_search": 3.82
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "f9a4047d-bd8c-4da2-8c16-fabb54d63142",
+            "chunk_index": 4,
+            "page_number": 3,
+            "content": "Harbor Studio - Fictional Employee Handbook 3. Equipment and repairs New staff can request one external monitor through the Equipment form in the staff portal. The monitor allowance is 280 credits, including delivery. Attach a product quote and obtain your team lead's approval before ordering. Finance reimburses an approved purchase after receiving the invoice. This allowance does not cover headphones, phones, or personal computers. For a damaged studio laptop, submit a Repair ticket with the asset tag and a description of the fault. The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange",
+            "token_count": 120,
+            "similarity": 0.5492820748597333
+          },
+          {
+            "rank": 2,
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement.",
+            "token_count": 120,
+            "similarity": 0.3922582352314862
+          },
+          {
+            "rank": 3,
+            "chunk_id": "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7",
+            "chunk_index": 7,
+            "page_number": 4,
+            "content": "the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement. Meals are reimbursed up to 35 credits per travel day. The handbook does not specify personal mileage reimbursement or international currency conversion rates. harbor-handbook-v1 | Page 4 | Fictional demo data",
+            "token_count": 61,
+            "similarity": 0.3323990419850882
+          }
+        ],
+        "answer": "The monitor allowance is 280 credits, including delivery. You need to attach a product quote and obtain your team lead's approval before ordering.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "f9a4047d-bd8c-4da2-8c16-fabb54d63142"
+        ],
+        "citations": [
+          {
+            "chunk_id": "f9a4047d-bd8c-4da2-8c16-fabb54d63142",
+            "chunk_index": 4,
+            "page_number": 3
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "f9a4047d-bd8c-4da2-8c16-fabb54d63142",
+            "chunk_index": 4,
+            "page_number": 3,
+            "content": "Harbor Studio - Fictional Employee Handbook 3. Equipment and repairs New staff can request one external monitor through the Equipment form in the staff portal. The monitor allowance is 280 credits, including delivery. Attach a product quote and obtain your team lead's approval before ordering. Finance reimburses an approved purchase after receiving the invoice. This allowance does not cover headphones, phones, or personal computers. For a damaged studio laptop, submit a Repair ticket with the asset tag and a description of the fault. The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange"
+          },
+          {
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement."
+          },
+          {
+            "chunk_id": "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7",
+            "chunk_index": 7,
+            "page_number": 4,
+            "content": "the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement. Meals are reimbursed up to 35 credits per travel day. The handbook does not specify personal mileage reimbursement or international currency conversion rates. harbor-handbook-v1 | Page 4 | Fictional demo data"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1393.84
+        }
+      }
+    },
+    {
+      "id": "loaner-return",
+      "kind": "answerable",
+      "question": "When must I give back a loaner after my repaired laptop arrives?",
+      "expected": [
+        {
+          "section": "equipment",
+          "page": 3,
+          "anchor": "Return the loaner within three business days"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "When must I give back a loaner after my repaired laptop arrives?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          0.01256561279296875,
+          0.0169830322265625,
+          -0.00302886962890625
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 249.81,
+          "vector_search": 3.9
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "09df4ec9-bc06-4f5a-aaa0-36e97b12045b",
+            "chunk_index": 5,
+            "page_number": 3,
+            "content": "The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange repairs with an outside shop. Return the loaner within three business days after your repaired laptop is delivered. Loaner timing is measured in business days, not calendar days. harbor-handbook-v1 | Page 3 | Fictional demo data",
+            "token_count": 68,
+            "similarity": 0.7312117847516615
+          },
+          {
+            "rank": 2,
+            "chunk_id": "f9a4047d-bd8c-4da2-8c16-fabb54d63142",
+            "chunk_index": 4,
+            "page_number": 3,
+            "content": "Harbor Studio - Fictional Employee Handbook 3. Equipment and repairs New staff can request one external monitor through the Equipment form in the staff portal. The monitor allowance is 280 credits, including delivery. Attach a product quote and obtain your team lead's approval before ordering. Finance reimburses an approved purchase after receiving the invoice. This allowance does not cover headphones, phones, or personal computers. For a damaged studio laptop, submit a Repair ticket with the asset tag and a description of the fault. The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange",
+            "token_count": 120,
+            "similarity": 0.37668628346920163
+          },
+          {
+            "rank": 3,
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911.",
+            "token_count": 120,
+            "similarity": 0.36612546555528314
+          }
+        ],
+        "answer": "You must return the loaner within three business days after your repaired laptop is delivered.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "09df4ec9-bc06-4f5a-aaa0-36e97b12045b"
+        ],
+        "citations": [
+          {
+            "chunk_id": "09df4ec9-bc06-4f5a-aaa0-36e97b12045b",
+            "chunk_index": 5,
+            "page_number": 3
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "09df4ec9-bc06-4f5a-aaa0-36e97b12045b",
+            "chunk_index": 5,
+            "page_number": 3,
+            "content": "The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange repairs with an outside shop. Return the loaner within three business days after your repaired laptop is delivered. Loaner timing is measured in business days, not calendar days. harbor-handbook-v1 | Page 3 | Fictional demo data"
+          },
+          {
+            "chunk_id": "f9a4047d-bd8c-4da2-8c16-fabb54d63142",
+            "chunk_index": 4,
+            "page_number": 3,
+            "content": "Harbor Studio - Fictional Employee Handbook 3. Equipment and repairs New staff can request one external monitor through the Equipment form in the staff portal. The monitor allowance is 280 credits, including delivery. Attach a product quote and obtain your team lead's approval before ordering. Finance reimburses an approved purchase after receiving the invoice. This allowance does not cover headphones, phones, or personal computers. For a damaged studio laptop, submit a Repair ticket with the asset tag and a description of the fault. The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange"
+          },
+          {
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911."
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 994.93
+        }
+      }
+    },
+    {
+      "id": "hotel-cap",
+      "kind": "answerable",
+      "question": "How much can a hotel cost per night before I need an exception?",
+      "expected": [
+        {
+          "section": "travel",
+          "page": 4,
+          "anchor": "The hotel limit is 160 credits per night"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "How much can a hotel cost per night before I need an exception?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          -0.00955963134765625,
+          0.003414154052734375,
+          0.04345703125
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 201.63,
+          "vector_search": 3.94
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement.",
+            "token_count": 120,
+            "similarity": 0.3398025761922252
+          },
+          {
+            "rank": 2,
+            "chunk_id": "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7",
+            "chunk_index": 7,
+            "page_number": 4,
+            "content": "the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement. Meals are reimbursed up to 35 credits per travel day. The handbook does not specify personal mileage reimbursement or international currency conversion rates. harbor-handbook-v1 | Page 4 | Fictional demo data",
+            "token_count": 61,
+            "similarity": 0.2976933394994279
+          },
+          {
+            "rank": 3,
+            "chunk_id": "d3c9f11d-501a-446f-8749-7b42b5c03e70",
+            "chunk_index": 11,
+            "page_number": 6,
+            "content": "24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at reception and escort them throughout their visit. Visitors may use the HarborGuest Wi-Fi network but cannot use staff badges or access the private studio network. The handbook does not list a guest Wi-Fi password. harbor-handbook-v1 | Page 6 | Fictional demo data",
+            "token_count": 74,
+            "similarity": 0.21647598905439458
+          }
+        ],
+        "answer": "A hotel can cost up to 160 credits per night before you need an exception, excluding local taxes. Any cost beyond this limit requires finance approval before a reservation is made.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "ca213eae-dfe4-45ad-b026-efdc2a1b0e11"
+        ],
+        "citations": [
+          {
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement."
+          },
+          {
+            "chunk_id": "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7",
+            "chunk_index": 7,
+            "page_number": 4,
+            "content": "the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement. Meals are reimbursed up to 35 credits per travel day. The handbook does not specify personal mileage reimbursement or international currency conversion rates. harbor-handbook-v1 | Page 4 | Fictional demo data"
+          },
+          {
+            "chunk_id": "d3c9f11d-501a-446f-8749-7b42b5c03e70",
+            "chunk_index": 11,
+            "page_number": 6,
+            "content": "24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at reception and escort them throughout their visit. Visitors may use the HarborGuest Wi-Fi network but cannot use staff badges or access the private studio network. The handbook does not list a guest Wi-Fi password. harbor-handbook-v1 | Page 6 | Fictional demo data"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1193.64
+        }
+      }
+    },
+    {
+      "id": "travel-receipts",
+      "kind": "answerable",
+      "question": "When do I submit receipts after returning from a business trip?",
+      "expected": [
+        {
+          "section": "travel",
+          "page": 4,
+          "anchor": "Submit travel receipts within 15 calendar days"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 2,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "When do I submit receipts after returning from a business trip?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          0.0030498504638671875,
+          0.02459716796875,
+          0.039825439453125
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 170.62,
+          "vector_search": 4.1
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7",
+            "chunk_index": 7,
+            "page_number": 4,
+            "content": "the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement. Meals are reimbursed up to 35 credits per travel day. The handbook does not specify personal mileage reimbursement or international currency conversion rates. harbor-handbook-v1 | Page 4 | Fictional demo data",
+            "token_count": 61,
+            "similarity": 0.5276726134045202
+          },
+          {
+            "rank": 2,
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement.",
+            "token_count": 120,
+            "similarity": 0.5227818740153334
+          },
+          {
+            "rank": 3,
+            "chunk_id": "09df4ec9-bc06-4f5a-aaa0-36e97b12045b",
+            "chunk_index": 5,
+            "page_number": 3,
+            "content": "The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange repairs with an outside shop. Return the loaner within three business days after your repaired laptop is delivered. Loaner timing is measured in business days, not calendar days. harbor-handbook-v1 | Page 3 | Fictional demo data",
+            "token_count": 68,
+            "similarity": 0.33503902869770374
+          }
+        ],
+        "answer": "Travel receipts must be submitted within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. If a receipt is missing, a signed missing-receipt statement is required.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+          "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7"
+        ],
+        "citations": [
+          {
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4
+          },
+          {
+            "chunk_id": "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7",
+            "chunk_index": 7,
+            "page_number": 4
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7",
+            "chunk_index": 7,
+            "page_number": 4,
+            "content": "the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement. Meals are reimbursed up to 35 credits per travel day. The handbook does not specify personal mileage reimbursement or international currency conversion rates. harbor-handbook-v1 | Page 4 | Fictional demo data"
+          },
+          {
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement."
+          },
+          {
+            "chunk_id": "09df4ec9-bc06-4f5a-aaa0-36e97b12045b",
+            "chunk_index": 5,
+            "page_number": 3,
+            "content": "The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange repairs with an outside shop. Return the loaner within three business days after your repaired laptop is delivered. Loaner timing is measured in business days, not calendar days. harbor-handbook-v1 | Page 3 | Fictional demo data"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1324.72
+        }
+      }
+    },
+    {
+      "id": "lost-laptop",
+      "kind": "answerable",
+      "question": "My studio laptop was stolen. What immediate report and follow-up ticket are required?",
+      "expected": [
+        {
+          "section": "incidents",
+          "page": 5,
+          "anchor": "call the security line at extension 911 immediately"
+        },
+        {
+          "section": "incidents",
+          "page": 5,
+          "anchor": "file a Lost device ticket before the end of the same day"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "My studio laptop was stolen. What immediate report and follow-up ticket are required?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          -0.004436492919921875,
+          0.00038051605224609375,
+          8.785724639892578e-05
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 185.07,
+          "vector_search": 4.01
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911.",
+            "token_count": 120,
+            "similarity": 0.618284238786602
+          },
+          {
+            "rank": 2,
+            "chunk_id": "09df4ec9-bc06-4f5a-aaa0-36e97b12045b",
+            "chunk_index": 5,
+            "page_number": 3,
+            "content": "The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange repairs with an outside shop. Return the loaner within three business days after your repaired laptop is delivered. Loaner timing is measured in business days, not calendar days. harbor-handbook-v1 | Page 3 | Fictional demo data",
+            "token_count": 68,
+            "similarity": 0.4374943975717951
+          },
+          {
+            "rank": 3,
+            "chunk_id": "7757a5f6-37cc-45d1-b93b-579adc667d4c",
+            "chunk_index": 9,
+            "page_number": 5,
+            "content": "If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911. Preserve the message for the security team. Reporting a suspicious email does not require proof that an attack succeeded. These security steps take priority over routine equipment repair requests. harbor-handbook-v1 | Page 5 | Fictional demo data",
+            "token_count": 65,
+            "similarity": 0.43736204058766026
+          }
+        ],
+        "answer": "If you lose a studio laptop, immediately call the security line at extension 911 and provide the asset tag if known. Security will lock the device remotely. Additionally, you must file a Lost device ticket before the end of the same day.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "359080ed-f316-45f6-9e3a-60743d6e3bf3"
+        ],
+        "citations": [
+          {
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911."
+          },
+          {
+            "chunk_id": "09df4ec9-bc06-4f5a-aaa0-36e97b12045b",
+            "chunk_index": 5,
+            "page_number": 3,
+            "content": "The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange repairs with an outside shop. Return the loaner within three business days after your repaired laptop is delivered. Loaner timing is measured in business days, not calendar days. harbor-handbook-v1 | Page 3 | Fictional demo data"
+          },
+          {
+            "chunk_id": "7757a5f6-37cc-45d1-b93b-579adc667d4c",
+            "chunk_index": 9,
+            "page_number": 5,
+            "content": "If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911. Preserve the message for the security team. Reporting a suspicious email does not require proof that an attack succeeded. These security steps take priority over routine equipment repair requests. harbor-handbook-v1 | Page 5 | Fictional demo data"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1135.47
+        }
+      }
+    },
+    {
+      "id": "opened-attachment",
+      "kind": "answerable",
+      "question": "I opened an attachment in a suspicious email. What should I do now?",
+      "expected": [
+        {
+          "section": "incidents",
+          "page": 5,
+          "anchor": "disconnect the laptop from Wi-Fi and call extension 911"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "I opened an attachment in a suspicious email. What should I do now?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          -0.0183258056640625,
+          0.01495361328125,
+          0.00438690185546875
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 178.1,
+          "vector_search": 3.82
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "7757a5f6-37cc-45d1-b93b-579adc667d4c",
+            "chunk_index": 9,
+            "page_number": 5,
+            "content": "If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911. Preserve the message for the security team. Reporting a suspicious email does not require proof that an attack succeeded. These security steps take priority over routine equipment repair requests. harbor-handbook-v1 | Page 5 | Fictional demo data",
+            "token_count": 65,
+            "similarity": 0.6222345463062527
+          },
+          {
+            "rank": 2,
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911.",
+            "token_count": 120,
+            "similarity": 0.35090247151672593
+          },
+          {
+            "rank": 3,
+            "chunk_id": "169fe4d8-9010-438c-9346-f0b67279d98c",
+            "chunk_index": 3,
+            "page_number": 2,
+            "content": "your identity by a scheduled video call before enrolling a replacement device. A password reset alone does not replace an AuthKey device. Never approve an unexpected authentication request. Report unexpected prompts to security@harbor.example, even if you did not approve them. harbor-handbook-v1 | Page 2 | Fictional demo data",
+            "token_count": 65,
+            "similarity": 0.23650676345408606
+          }
+        ],
+        "answer": "If you already opened an attachment in a suspicious email, you should immediately disconnect your laptop from Wi-Fi and call extension 911. Also, preserve the suspicious message for the security team.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "7757a5f6-37cc-45d1-b93b-579adc667d4c",
+          "359080ed-f316-45f6-9e3a-60743d6e3bf3"
+        ],
+        "citations": [
+          {
+            "chunk_id": "7757a5f6-37cc-45d1-b93b-579adc667d4c",
+            "chunk_index": 9,
+            "page_number": 5
+          },
+          {
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "7757a5f6-37cc-45d1-b93b-579adc667d4c",
+            "chunk_index": 9,
+            "page_number": 5,
+            "content": "If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911. Preserve the message for the security team. Reporting a suspicious email does not require proof that an attack succeeded. These security steps take priority over routine equipment repair requests. harbor-handbook-v1 | Page 5 | Fictional demo data"
+          },
+          {
+            "chunk_id": "359080ed-f316-45f6-9e3a-60743d6e3bf3",
+            "chunk_index": 8,
+            "page_number": 5,
+            "content": "Harbor Studio - Fictional Employee Handbook 5. Security incidents If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief. For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911."
+          },
+          {
+            "chunk_id": "169fe4d8-9010-438c-9346-f0b67279d98c",
+            "chunk_index": 3,
+            "page_number": 2,
+            "content": "your identity by a scheduled video call before enrolling a replacement device. A password reset alone does not replace an AuthKey device. Never approve an unexpected authentication request. Report unexpected prompts to security@harbor.example, even if you did not approve them. harbor-handbook-v1 | Page 2 | Fictional demo data"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1266.42
+        }
+      }
+    },
+    {
+      "id": "visitor-registration",
+      "kind": "answerable",
+      "question": "How far ahead should I register a visitor, and can they use the private network?",
+      "expected": [
+        {
+          "section": "building",
+          "page": 6,
+          "anchor": "at least 24 hours before arrival"
+        },
+        {
+          "section": "building",
+          "page": 6,
+          "anchor": "cannot use staff badges or access the private studio network"
+        }
+      ],
+      "hit_at_3": true,
+      "evidence_recall_at_3": 1.0,
+      "all_evidence_at_3": true,
+      "first_expected_rank": 1,
+      "citation_valid": true,
+      "expected_source_cited": true,
+      "cited_evidence_recall": 1.0,
+      "expected_status": "answered",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "How far ahead should I register a visitor, and can they use the private network?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          0.023284912109375,
+          -0.0238037109375,
+          0.01776123046875
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 184.86,
+          "vector_search": 4.01
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "d3c9f11d-501a-446f-8749-7b42b5c03e70",
+            "chunk_index": 11,
+            "page_number": 6,
+            "content": "24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at reception and escort them throughout their visit. Visitors may use the HarborGuest Wi-Fi network but cannot use staff badges or access the private studio network. The handbook does not list a guest Wi-Fi password. harbor-handbook-v1 | Page 6 | Fictional demo data",
+            "token_count": 74,
+            "similarity": 0.5090858107348147
+          },
+          {
+            "rank": 2,
+            "chunk_id": "713ba2db-0318-4f8f-a9eb-fce973ee0121",
+            "chunk_index": 10,
+            "page_number": 6,
+            "content": "Harbor Studio - Fictional Employee Handbook 6. Office and visitor access The studio is open to staff from 07:00 to 21:00 on weekdays. Tap your staff badge at the entrance. Weekend entry requires approval from the operations lead at least one business day in advance. A forgotten badge can be replaced with a same-day temporary badge at reception after identity verification. Temporary badges expire at 21:00 on the day they are issued. Register visitors in the Guest form at least 24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at",
+            "token_count": 120,
+            "similarity": 0.35867072799669775
+          },
+          {
+            "rank": 3,
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1,
+            "content": "disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17 persists, send the error code and time to helpdesk@harbor.example. Never send passwords or AuthKey codes to support. Personal laptops cannot connect to the studio VPN. The helpdesk cannot grant an exception to this device rule. harbor-handbook-v1 | Page 1 | Fictional demo data",
+            "token_count": 81,
+            "similarity": 0.30850203674653054
+          }
+        ],
+        "answer": "Visitors must be registered at least 24 hours before arrival by providing their name, host, and arrival time. Visitors may use the HarborGuest Wi-Fi network but cannot use staff badges or access the private studio network.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "713ba2db-0318-4f8f-a9eb-fce973ee0121",
+          "d3c9f11d-501a-446f-8749-7b42b5c03e70"
+        ],
+        "citations": [
+          {
+            "chunk_id": "713ba2db-0318-4f8f-a9eb-fce973ee0121",
+            "chunk_index": 10,
+            "page_number": 6
+          },
+          {
+            "chunk_id": "d3c9f11d-501a-446f-8749-7b42b5c03e70",
+            "chunk_index": 11,
+            "page_number": 6
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "d3c9f11d-501a-446f-8749-7b42b5c03e70",
+            "chunk_index": 11,
+            "page_number": 6,
+            "content": "24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at reception and escort them throughout their visit. Visitors may use the HarborGuest Wi-Fi network but cannot use staff badges or access the private studio network. The handbook does not list a guest Wi-Fi password. harbor-handbook-v1 | Page 6 | Fictional demo data"
+          },
+          {
+            "chunk_id": "713ba2db-0318-4f8f-a9eb-fce973ee0121",
+            "chunk_index": 10,
+            "page_number": 6,
+            "content": "Harbor Studio - Fictional Employee Handbook 6. Office and visitor access The studio is open to staff from 07:00 to 21:00 on weekdays. Tap your staff badge at the entrance. Weekend entry requires approval from the operations lead at least one business day in advance. A forgotten badge can be replaced with a same-day temporary badge at reception after identity verification. Temporary badges expire at 21:00 on the day they are issued. Register visitors in the Guest form at least 24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at"
+          },
+          {
+            "chunk_id": "a974fbfe-5dbb-44b3-a2c8-2907d8f00038",
+            "chunk_index": 1,
+            "page_number": 1,
+            "content": "disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17 persists, send the error code and time to helpdesk@harbor.example. Never send passwords or AuthKey codes to support. Personal laptops cannot connect to the studio VPN. The helpdesk cannot grant an exception to this device rule. harbor-handbook-v1 | Page 1 | Fictional demo data"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1209.93
+        }
+      }
+    },
+    {
+      "id": "ambiguous-allowance",
+      "kind": "ambiguous",
+      "question": "How much is my allowance?",
+      "expected": [],
+      "hit_at_3": null,
+      "evidence_recall_at_3": null,
+      "all_evidence_at_3": null,
+      "first_expected_rank": null,
+      "citation_valid": true,
+      "expected_source_cited": null,
+      "cited_evidence_recall": null,
+      "expected_status": "insufficient_evidence",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "How much is my allowance?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          0.005168914794921875,
+          -0.046417236328125,
+          0.00843048095703125
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 176.6,
+          "vector_search": 3.99
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7",
+            "chunk_index": 7,
+            "page_number": 4,
+            "content": "the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement. Meals are reimbursed up to 35 credits per travel day. The handbook does not specify personal mileage reimbursement or international currency conversion rates. harbor-handbook-v1 | Page 4 | Fictional demo data",
+            "token_count": 61,
+            "similarity": 0.33415490944311177
+          },
+          {
+            "rank": 2,
+            "chunk_id": "f9a4047d-bd8c-4da2-8c16-fabb54d63142",
+            "chunk_index": 4,
+            "page_number": 3,
+            "content": "Harbor Studio - Fictional Employee Handbook 3. Equipment and repairs New staff can request one external monitor through the Equipment form in the staff portal. The monitor allowance is 280 credits, including delivery. Attach a product quote and obtain your team lead's approval before ordering. Finance reimburses an approved purchase after receiving the invoice. This allowance does not cover headphones, phones, or personal computers. For a damaged studio laptop, submit a Repair ticket with the asset tag and a description of the fault. The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange",
+            "token_count": 120,
+            "similarity": 0.2832584208584368
+          },
+          {
+            "rank": 3,
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement.",
+            "token_count": 120,
+            "similarity": 0.25234443975555076
+          }
+        ],
+        "answer": "The supplied document context does not contain enough information to answer this question.",
+        "answer_status": "insufficient_evidence",
+        "evidence_chunk_ids": [],
+        "citations": [],
+        "context": [
+          {
+            "chunk_id": "b23b6567-cb9a-4fef-a0eb-4d0d8b5eb7f7",
+            "chunk_index": 7,
+            "page_number": 4,
+            "content": "the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement. Meals are reimbursed up to 35 credits per travel day. The handbook does not specify personal mileage reimbursement or international currency conversion rates. harbor-handbook-v1 | Page 4 | Fictional demo data"
+          },
+          {
+            "chunk_id": "f9a4047d-bd8c-4da2-8c16-fabb54d63142",
+            "chunk_index": 4,
+            "page_number": 3,
+            "content": "Harbor Studio - Fictional Employee Handbook 3. Equipment and repairs New staff can request one external monitor through the Equipment form in the staff portal. The monitor allowance is 280 credits, including delivery. Attach a product quote and obtain your team lead's approval before ordering. Finance reimburses an approved purchase after receiving the invoice. This allowance does not cover headphones, phones, or personal computers. For a damaged studio laptop, submit a Repair ticket with the asset tag and a description of the fault. The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange"
+          },
+          {
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement."
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 795.65
+        }
+      }
+    },
+    {
+      "id": "ambiguous-deadline",
+      "kind": "ambiguous",
+      "question": "What is the deadline?",
+      "expected": [],
+      "hit_at_3": null,
+      "evidence_recall_at_3": null,
+      "all_evidence_at_3": null,
+      "first_expected_rank": null,
+      "citation_valid": true,
+      "expected_source_cited": null,
+      "cited_evidence_recall": null,
+      "expected_status": "insufficient_evidence",
+      "status_match": false,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "What is the deadline?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          0.0178375244140625,
+          0.0275726318359375,
+          0.027099609375
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 178.87,
+          "vector_search": 3.84
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "09df4ec9-bc06-4f5a-aaa0-36e97b12045b",
+            "chunk_index": 5,
+            "page_number": 3,
+            "content": "The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange repairs with an outside shop. Return the loaner within three business days after your repaired laptop is delivered. Loaner timing is measured in business days, not calendar days. harbor-handbook-v1 | Page 3 | Fictional demo data",
+            "token_count": 68,
+            "similarity": 0.2641721753437889
+          },
+          {
+            "rank": 2,
+            "chunk_id": "713ba2db-0318-4f8f-a9eb-fce973ee0121",
+            "chunk_index": 10,
+            "page_number": 6,
+            "content": "Harbor Studio - Fictional Employee Handbook 6. Office and visitor access The studio is open to staff from 07:00 to 21:00 on weekdays. Tap your staff badge at the entrance. Weekend entry requires approval from the operations lead at least one business day in advance. A forgotten badge can be replaced with a same-day temporary badge at reception after identity verification. Temporary badges expire at 21:00 on the day they are issued. Register visitors in the Guest form at least 24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at",
+            "token_count": 120,
+            "similarity": 0.2567630437447106
+          },
+          {
+            "rank": 3,
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement.",
+            "token_count": 120,
+            "similarity": 0.2488615863784962
+          }
+        ],
+        "answer": "The deadline to submit travel receipts is within 15 calendar days after returning from the trip.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "ca213eae-dfe4-45ad-b026-efdc2a1b0e11"
+        ],
+        "citations": [
+          {
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "09df4ec9-bc06-4f5a-aaa0-36e97b12045b",
+            "chunk_index": 5,
+            "page_number": 3,
+            "content": "The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange repairs with an outside shop. Return the loaner within three business days after your repaired laptop is delivered. Loaner timing is measured in business days, not calendar days. harbor-handbook-v1 | Page 3 | Fictional demo data"
+          },
+          {
+            "chunk_id": "713ba2db-0318-4f8f-a9eb-fce973ee0121",
+            "chunk_index": 10,
+            "page_number": 6,
+            "content": "Harbor Studio - Fictional Employee Handbook 6. Office and visitor access The studio is open to staff from 07:00 to 21:00 on weekdays. Tap your staff badge at the entrance. Weekend entry requires approval from the operations lead at least one business day in advance. A forgotten badge can be replaced with a same-day temporary badge at reception after identity verification. Temporary badges expire at 21:00 on the day they are issued. Register visitors in the Guest form at least 24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at"
+          },
+          {
+            "chunk_id": "ca213eae-dfe4-45ad-b026-efdc2a1b0e11",
+            "chunk_index": 6,
+            "page_number": 4,
+            "content": "Harbor Studio - Fictional Employee Handbook 4. Travel and expenses Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made. Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement."
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1116.45
+        }
+      }
+    },
+    {
+      "id": "guest-password",
+      "kind": "unanswerable",
+      "question": "What is the password for HarborGuest Wi-Fi?",
+      "expected": [],
+      "hit_at_3": null,
+      "evidence_recall_at_3": null,
+      "all_evidence_at_3": null,
+      "first_expected_rank": null,
+      "citation_valid": true,
+      "expected_source_cited": null,
+      "cited_evidence_recall": null,
+      "expected_status": "insufficient_evidence",
+      "status_match": false,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "What is the password for HarborGuest Wi-Fi?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          0.0272369384765625,
+          -0.046875,
+          0.00513458251953125
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 180.05,
+          "vector_search": 4.43
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "d3c9f11d-501a-446f-8749-7b42b5c03e70",
+            "chunk_index": 11,
+            "page_number": 6,
+            "content": "24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at reception and escort them throughout their visit. Visitors may use the HarborGuest Wi-Fi network but cannot use staff badges or access the private studio network. The handbook does not list a guest Wi-Fi password. harbor-handbook-v1 | Page 6 | Fictional demo data",
+            "token_count": 74,
+            "similarity": 0.6515197530701372
+          },
+          {
+            "rank": 2,
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2,
+            "content": "Harbor Studio - Fictional Employee Handbook 2. Account recovery To reset a forgotten work password, open accounts.harbor.example and select Recover account. Enter your work email and use the recovery link sent to your registered backup email. The recovery link expires after 20 minutes. A new password must contain at least 14 characters. Changing a password signs out existing browser sessions; sign in again after the reset. If your AuthKey phone is lost, call the helpdesk at extension 410. Support verifies your identity by a scheduled video call before enrolling a replacement device. A password reset alone does",
+            "token_count": 120,
+            "similarity": 0.5578139848189905
+          },
+          {
+            "rank": 3,
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17",
+            "token_count": 120,
+            "similarity": 0.5500589875182701
+          }
+        ],
+        "answer": "The handbook does not list a password for the HarborGuest Wi-Fi network.",
+        "answer_status": "answered",
+        "evidence_chunk_ids": [
+          "d3c9f11d-501a-446f-8749-7b42b5c03e70"
+        ],
+        "citations": [
+          {
+            "chunk_id": "d3c9f11d-501a-446f-8749-7b42b5c03e70",
+            "chunk_index": 11,
+            "page_number": 6
+          }
+        ],
+        "context": [
+          {
+            "chunk_id": "d3c9f11d-501a-446f-8749-7b42b5c03e70",
+            "chunk_index": 11,
+            "page_number": 6,
+            "content": "24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at reception and escort them throughout their visit. Visitors may use the HarborGuest Wi-Fi network but cannot use staff badges or access the private studio network. The handbook does not list a guest Wi-Fi password. harbor-handbook-v1 | Page 6 | Fictional demo data"
+          },
+          {
+            "chunk_id": "8e10d5f5-26fb-4f51-b827-dd85f5d91940",
+            "chunk_index": 2,
+            "page_number": 2,
+            "content": "Harbor Studio - Fictional Employee Handbook 2. Account recovery To reset a forgotten work password, open accounts.harbor.example and select Recover account. Enter your work email and use the recovery link sent to your registered backup email. The recovery link expires after 20 minutes. A new password must contain at least 14 characters. Changing a password signs out existing browser sessions; sign in again after the reset. If your AuthKey phone is lost, call the helpdesk at extension 410. Support verifies your identity by a scheduled video call before enrolling a replacement device. A password reset alone does"
+          },
+          {
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 1174.28
+        }
+      }
+    },
+    {
+      "id": "parental-leave",
+      "kind": "unanswerable",
+      "question": "How many weeks of paid parental leave does Harbor Studio provide?",
+      "expected": [],
+      "hit_at_3": null,
+      "evidence_recall_at_3": null,
+      "all_evidence_at_3": null,
+      "first_expected_rank": null,
+      "citation_valid": true,
+      "expected_source_cited": null,
+      "cited_evidence_recall": null,
+      "expected_status": "insufficient_evidence",
+      "status_match": true,
+      "response": {
+        "document_id": "f2c9235e-e05a-4e12-abbe-3f38177c9979",
+        "question": "How many weeks of paid parental leave does Harbor Studio provide?",
+        "k": 3,
+        "min_similarity": -1.0,
+        "searched_chunks": 12,
+        "model": "text-embedding-3-small",
+        "dimensions": 1536,
+        "query_embedding_preview": [
+          -0.0223236083984375,
+          0.0166168212890625,
+          0.059844970703125
+        ],
+        "score_definition": "1 - cosine distance (pgvector <=>); higher is closer",
+        "timings_ms": {
+          "query_embedding": 166.4,
+          "vector_search": 4.03
+        },
+        "results": [
+          {
+            "rank": 1,
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17",
+            "token_count": 120,
+            "similarity": 0.5057666865708986
+          },
+          {
+            "rank": 2,
+            "chunk_id": "713ba2db-0318-4f8f-a9eb-fce973ee0121",
+            "chunk_index": 10,
+            "page_number": 6,
+            "content": "Harbor Studio - Fictional Employee Handbook 6. Office and visitor access The studio is open to staff from 07:00 to 21:00 on weekdays. Tap your staff badge at the entrance. Weekend entry requires approval from the operations lead at least one business day in advance. A forgotten badge can be replaced with a same-day temporary badge at reception after identity verification. Temporary badges expire at 21:00 on the day they are issued. Register visitors in the Guest form at least 24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at",
+            "token_count": 120,
+            "similarity": 0.4887956563874516
+          },
+          {
+            "rank": 3,
+            "chunk_id": "f9a4047d-bd8c-4da2-8c16-fabb54d63142",
+            "chunk_index": 4,
+            "page_number": 3,
+            "content": "Harbor Studio - Fictional Employee Handbook 3. Equipment and repairs New staff can request one external monitor through the Equipment form in the staff portal. The monitor allowance is 280 credits, including delivery. Attach a product quote and obtain your team lead's approval before ordering. Finance reimburses an approved purchase after receiving the invoice. This allowance does not cover headphones, phones, or personal computers. For a damaged studio laptop, submit a Repair ticket with the asset tag and a description of the fault. The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange",
+            "token_count": 120,
+            "similarity": 0.4520204891911743
+          }
+        ],
+        "answer": "The supplied document context does not contain enough information to answer this question.",
+        "answer_status": "insufficient_evidence",
+        "evidence_chunk_ids": [],
+        "citations": [],
+        "context": [
+          {
+            "chunk_id": "3ab9614f-0b2e-4a8a-bfcb-dff5a97432e9",
+            "chunk_index": 0,
+            "page_number": 1,
+            "content": "Harbor Studio - Fictional Employee Handbook 1. Remote access Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available. If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17"
+          },
+          {
+            "chunk_id": "713ba2db-0318-4f8f-a9eb-fce973ee0121",
+            "chunk_index": 10,
+            "page_number": 6,
+            "content": "Harbor Studio - Fictional Employee Handbook 6. Office and visitor access The studio is open to staff from 07:00 to 21:00 on weekdays. Tap your staff badge at the entrance. Weekend entry requires approval from the operations lead at least one business day in advance. A forgotten badge can be replaced with a same-day temporary badge at reception after identity verification. Temporary badges expire at 21:00 on the day they are issued. Register visitors in the Guest form at least 24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at"
+          },
+          {
+            "chunk_id": "f9a4047d-bd8c-4da2-8c16-fabb54d63142",
+            "chunk_index": 4,
+            "page_number": 3,
+            "content": "Harbor Studio - Fictional Employee Handbook 3. Equipment and repairs New staff can request one external monitor through the Equipment form in the staff portal. The monitor allowance is 280 credits, including delivery. Attach a product quote and obtain your team lead's approval before ordering. Finance reimburses an approved purchase after receiving the invoice. This allowance does not cover headphones, phones, or personal computers. For a damaged studio laptop, submit a Repair ticket with the asset tag and a description of the fault. The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange"
+          }
+        ],
+        "generation": {
+          "model": "gpt-4.1-mini-2025-04-14",
+          "performed": true,
+          "duration_ms": 738.2
+        }
+      }
+    }
+  ],
+  "summary": {
+    "questions": 16,
+    "request_errors": 0,
+    "hit_at_3": {
+      "value": 1.0,
+      "count": 12
+    },
+    "macro_evidence_recall_at_3": {
+      "value": 1.0,
+      "count": 12
+    },
+    "all_evidence_at_3": {
+      "value": 1.0,
+      "count": 12
+    },
+    "citation_validity": {
+      "value": 1.0,
+      "count": 16
+    },
+    "expected_source_cited": {
+      "value": 1.0,
+      "count": 12
+    },
+    "macro_cited_evidence_recall": {
+      "value": 1.0,
+      "count": 12
+    },
+    "supported_answer_rate": {
+      "value": 1.0,
+      "count": 12
+    },
+    "unanswerable_abstention_rate": {
+      "value": 0.5,
+      "count": 2
+    },
+    "ambiguous_abstention_rate": {
+      "value": 0.5,
+      "count": 2
+    }
+  },
+  "completed_at": "2026-09-27T07:04:33.657458+00:00"
+}

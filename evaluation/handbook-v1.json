@@ -1,0 +1,76 @@
+{
+  "version": "harbor-handbook-v1",
+  "title": "Harbor Studio - Fictional Employee Handbook",
+  "chunk_size": 120,
+  "chunk_overlap": 20,
+  "k": 3,
+  "min_similarity": -1,
+  "pages": [
+    {
+      "section": "remote-access",
+      "title": "1. Remote access",
+      "paragraphs": [
+        "Harbor Studio is a fictional design company. This handbook is a demo fixture, not real company policy. Staff working away from the office use the HarborLink VPN client on a managed laptop. Open HarborLink, choose the studio.harbor.example gateway, and sign in with your work email. Approve the sign-in using the AuthKey app. A green Connected banner means the private network is available.",
+        "If HarborLink reports error H17, disconnect the client, check that the laptop clock is set automatically, and reconnect once. If H17 persists, send the error code and time to helpdesk@harbor.example. Never send passwords or AuthKey codes to support. Personal laptops cannot connect to the studio VPN. The helpdesk cannot grant an exception to this device rule."
+      ]
+    },
+    {
+      "section": "account-recovery",
+      "title": "2. Account recovery",
+      "paragraphs": [
+        "To reset a forgotten work password, open accounts.harbor.example and select Recover account. Enter your work email and use the recovery link sent to your registered backup email. The recovery link expires after 20 minutes. A new password must contain at least 14 characters. Changing a password signs out existing browser sessions; sign in again after the reset.",
+        "If your AuthKey phone is lost, call the helpdesk at extension 410. Support verifies your identity by a scheduled video call before enrolling a replacement device. A password reset alone does not replace an AuthKey device. Never approve an unexpected authentication request. Report unexpected prompts to security@harbor.example, even if you did not approve them."
+      ]
+    },
+    {
+      "section": "equipment",
+      "title": "3. Equipment and repairs",
+      "paragraphs": [
+        "New staff can request one external monitor through the Equipment form in the staff portal. The monitor allowance is 280 credits, including delivery. Attach a product quote and obtain your team lead's approval before ordering. Finance reimburses an approved purchase after receiving the invoice. This allowance does not cover headphones, phones, or personal computers.",
+        "For a damaged studio laptop, submit a Repair ticket with the asset tag and a description of the fault. The equipment desk arranges a loaner within two business days after accepting the ticket. Do not arrange repairs with an outside shop. Return the loaner within three business days after your repaired laptop is delivered. Loaner timing is measured in business days, not calendar days."
+      ]
+    },
+    {
+      "section": "travel",
+      "title": "4. Travel and expenses",
+      "paragraphs": [
+        "Business trips require written approval from the project owner before booking. Use the Travel form to record the destination, project code, dates, and estimated total. Train journeys should be booked in standard class. The hotel limit is 160 credits per night, excluding local taxes. An exception requires finance approval before a reservation is made.",
+        "Submit travel receipts within 15 calendar days after returning from the trip. Each claim must include the project code, the receipt, and a short business purpose. A missing receipt requires a signed missing-receipt statement. Meals are reimbursed up to 35 credits per travel day. The handbook does not specify personal mileage reimbursement or international currency conversion rates."
+      ]
+    },
+    {
+      "section": "incidents",
+      "title": "5. Security incidents",
+      "paragraphs": [
+        "If you lose a studio laptop, call the security line at extension 911 immediately and provide the asset tag if known. Security will lock the device remotely. Also file a Lost device ticket before the end of the same day. Do not wait for your next team meeting or try to recover the laptop by confronting a suspected thief.",
+        "For a suspicious email, use the Report phishing button in the mail client. Do not forward the message to colleagues. If you already opened an attachment, disconnect the laptop from Wi-Fi and call extension 911. Preserve the message for the security team. Reporting a suspicious email does not require proof that an attack succeeded. These security steps take priority over routine equipment repair requests."
+      ]
+    },
+    {
+      "section": "building",
+      "title": "6. Office and visitor access",
+      "paragraphs": [
+        "The studio is open to staff from 07:00 to 21:00 on weekdays. Tap your staff badge at the entrance. Weekend entry requires approval from the operations lead at least one business day in advance. A forgotten badge can be replaced with a same-day temporary badge at reception after identity verification. Temporary badges expire at 21:00 on the day they are issued.",
+        "Register visitors in the Guest form at least 24 hours before arrival. Provide the visitor's name, host, and arrival time. Meet visitors at reception and escort them throughout their visit. Visitors may use the HarborGuest Wi-Fi network but cannot use staff badges or access the private studio network. The handbook does not list a guest Wi-Fi password."
+      ]
+    }
+  ],
+  "questions": [
+    {"id":"vpn-login","kind":"answerable","question":"Which VPN gateway should I choose, and how do I approve the login?","expected":[{"section":"remote-access","page":1,"anchor":"choose the studio.harbor.example gateway"},{"section":"remote-access","page":1,"anchor":"Approve the sign-in using the AuthKey app"}]},
+    {"id":"vpn-h17","kind":"answerable","question":"What should I try when HarborLink shows H17?","expected":[{"section":"remote-access","page":1,"anchor":"check that the laptop clock is set automatically"}]},
+    {"id":"personal-laptop","kind":"answerable","question":"Can support make an exception so I can use my personal laptop on the VPN?","expected":[{"section":"remote-access","page":1,"anchor":"Personal laptops cannot connect to the studio VPN"}]},
+    {"id":"recovery-expiry","kind":"answerable","question":"How long does my password recovery link last?","expected":[{"section":"account-recovery","page":2,"anchor":"The recovery link expires after 20 minutes"}]},
+    {"id":"lost-authkey","kind":"answerable","question":"I lost my AuthKey phone. Who do I contact and how will they verify me?","expected":[{"section":"account-recovery","page":2,"anchor":"call the helpdesk at extension 410"},{"section":"account-recovery","page":2,"anchor":"scheduled video call"}]},
+    {"id":"monitor-budget","kind":"answerable","question":"What is the monitor allowance and whose approval do I need?","expected":[{"section":"equipment","page":3,"anchor":"The monitor allowance is 280 credits"},{"section":"equipment","page":3,"anchor":"team lead's approval before ordering"}]},
+    {"id":"loaner-return","kind":"answerable","question":"When must I give back a loaner after my repaired laptop arrives?","expected":[{"section":"equipment","page":3,"anchor":"Return the loaner within three business days"}]},
+    {"id":"hotel-cap","kind":"answerable","question":"How much can a hotel cost per night before I need an exception?","expected":[{"section":"travel","page":4,"anchor":"The hotel limit is 160 credits per night"}]},
+    {"id":"travel-receipts","kind":"answerable","question":"When do I submit receipts after returning from a business trip?","expected":[{"section":"travel","page":4,"anchor":"Submit travel receipts within 15 calendar days"}]},
+    {"id":"lost-laptop","kind":"answerable","question":"My studio laptop was stolen. What immediate report and follow-up ticket are required?","expected":[{"section":"incidents","page":5,"anchor":"call the security line at extension 911 immediately"},{"section":"incidents","page":5,"anchor":"file a Lost device ticket before the end of the same day"}]},
+    {"id":"opened-attachment","kind":"answerable","question":"I opened an attachment in a suspicious email. What should I do now?","expected":[{"section":"incidents","page":5,"anchor":"disconnect the laptop from Wi-Fi and call extension 911"}]},
+    {"id":"visitor-registration","kind":"answerable","question":"How far ahead should I register a visitor, and can they use the private network?","expected":[{"section":"building","page":6,"anchor":"at least 24 hours before arrival"},{"section":"building","page":6,"anchor":"cannot use staff badges or access the private studio network"}]},
+    {"id":"ambiguous-allowance","kind":"ambiguous","question":"How much is my allowance?","expected":[],"note":"Several unrelated allowances are specified; no unique allowance is identified by this question."},
+    {"id":"ambiguous-deadline","kind":"ambiguous","question":"What is the deadline?","expected":[],"note":"Several unrelated deadlines are specified; no unique task is identified by this question."},
+    {"id":"guest-password","kind":"unanswerable","question":"What is the password for HarborGuest Wi-Fi?","expected":[],"note":"The network name is present but its password is explicitly not supplied."},
+    {"id":"parental-leave","kind":"unanswerable","question":"How many weeks of paid parental leave does Harbor Studio provide?","expected":[],"note":"Parental leave is absent from the handbook."}
+  ]
+}

@@ -19,6 +19,8 @@ Open **http://localhost:3000**. API liveness: http://localhost:8000/health; data
 
 Start with `examples/it-support-guide.pdf`, **50 tokens / 10 overlap**: inspect five chunks, select **Embed & store chunks**, then ask “How do I connect to the VPN?” or “How do I reset my password?”. Choose **Retrieve chunks only** to inspect search independently.
 
+After parsing, **Embed & store** appears in its own Embedding Lab between document inspection and the Question Lab. The upload summary links directly to it. Embedding controls and execution traces sit side by side on desktop and stack on mobile, without extending the source/chunks/inspector row.
+
 Each answer citation can:
 - Select/highlight its exact extracted chunk and source page.
 - Jump to that passage in the ranked retrieval results.

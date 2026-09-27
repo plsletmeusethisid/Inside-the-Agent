@@ -107,6 +107,8 @@ Both committed real runs found all expected evidence in the top three for all 12
 
 ### 7. Finish the portfolio demo and deployment
 
+UI follow-up on 2026-09-27: moved Embed & store out of the upload panel into a separate Embedding Lab between the document grid and Question Lab, with an upload-summary jump link and responsive controls/trace columns. Updated `frontend/components/document-workbench.tsx`, `frontend/app/globals.css`, and README. Frontend production Docker build, lint, and TypeScript checks passed. Edge verified a real example upload, five matching chunk/source highlights, jump navigation, the moved embedding action using a safe error fixture, unchanged document-grid height when that error appeared, and a stacked 390px layout without overflow or browser errors. This layout check did not call the embedding provider; provider behavior was not re-evaluated.
+
 - Refine the interface for the three core views: source pages, ingestion pipeline, and question/answer retrieval trace. Ensure keyboard access, responsive layout, loading/empty/error states, and readable long documents. Keep visualization accurate to underlying outputs.
 - Document architecture, API contracts, schema/migrations, model/provider choices, costs/limits, security boundaries, and local setup in `README.md`. Record what is intentionally unsupported, especially OCR and original-PDF highlighting unless implemented.
 - Deploy frontend, API, and persistent pgvector Postgres to suitable hosts if requested and credentials are available. Configure production CORS, allowed file sizes, environment secrets, migrations, and health checks. Smoke-test an uploaded document and cited question after deployment. Do not publish credentials or sample user documents.

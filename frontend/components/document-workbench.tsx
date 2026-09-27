@@ -200,7 +200,7 @@ export function DocumentWorkbench() {
 
   return (
     <section className="document-lab" id="document-lab" aria-label="Document chunk inspection">
-      <div className="section-heading"><span>DOCUMENT LAB</span><span>PARSE / CHUNK / EMBED / STORE</span></div>
+      <div className="section-heading"><span>DOCUMENT LAB</span><span>PARSE / CHUNK / INSPECT</span></div>
       <div className="lab-grid">
         <form className="lab-panel upload-panel" onSubmit={handleUpload}>
           <div className="lab-kicker">01 — SOURCE</div>
@@ -226,28 +226,7 @@ export function DocumentWorkbench() {
             stages={[["parse", "Parse"], ["chunking", "Chunk"], ["storage", "Save pages & chunks"]]} />
           {document && !uploadEvents.length && <p>Saved document loaded. Past execution events are not replayed.</p>}
           {document && <div className="lab-summary"><strong>{document.filename}</strong><span>{document.page_count} pages · {chunks.length} chunks</span><span>{document.chunk_size} token limit · {document.chunk_overlap} token overlap</span><span>Uploaded {new Date(document.created_at).toLocaleString()}</span></div>}
-          {document && embedding && <div className="embedding-panel">
-            <h3>Embed & store</h3>
-            <p>Send this document’s chunks to OpenAI to generate embeddings, then store the full vectors in pgvector.</p>
-            <span className="embedding-model">{embedding.model} · {embedding.dimensions.toLocaleString()} dimensions</span>
-            <ExecutionTrace title="Embedding execution" events={embeddingEvents} status={embeddingTraceStatus}
-              stages={[["embedding", "Embed"], ["storage", "Store vectors"]]} />
-            <button className="primary-button" type="button" onClick={handleEmbedding} disabled={busy || processing || embedding.status === "complete"}>
-              {processing ? "Embedding & storing…" : embedding.status === "complete" ? "All embeddings stored ✓" : embedding.status === "failed" || embedding.status === "interrupted" ? "Retry remaining chunks →" : "Embed & store chunks →"}
-            </button>
-            {embeddingBusy && <button className="cancel-search" type="button" onClick={() => {
-              embeddingRequest.current?.abort(); setEmbeddingBusy(false); setEmbeddingTraceStatus("cancelled");
-              setEmbedding(current => current ? { ...current, status: "processing" } : null);
-              setEmbeddingError("Cancellation requested. Checking saved progress while the server releases this run.");
-            }}>Cancel embedding</button>}
-            <div className="embedding-progress" role="status" aria-live="polite">
-              <strong>{embedding.status === "complete" ? `${embedding.embedded_chunks} chunks embedded and stored.` : `${embedding.embedded_chunks} of ${embedding.total_chunks} chunks embedded and stored.`}</strong>
-              <progress aria-label="Chunks embedded and stored" value={embedding.embedded_chunks} max={Math.max(1, embedding.total_chunks)} />
-              {processing && <span>Completed batches appear as they are saved.</span>}
-              {(embedding.status === "failed" || embedding.status === "interrupted") && <span>Saved vectors are retained. Retry resumes the remaining chunks.</span>}
-            </div>
-            {(embeddingError || embedding.error) && <p className="lab-error" role="alert">{embeddingError || embedding.error}</p>}
-          </div>}
+          {document && embedding && <a className="source-link embedding-jump" href="#embedding-lab">Go to Embed & store ↓</a>}
         </form>
 
         <div className="lab-panel chunks-panel">
@@ -285,6 +264,35 @@ export function DocumentWorkbench() {
           </> : <div className="lab-empty">Choose a chunk to see its full text beside the page it came from.</div>}
         </div>
       </div>
+      {document && embedding && <section className="embedding-lab" id="embedding-lab" aria-labelledby="embedding-heading">
+        <div className="section-heading"><span>EMBEDDING LAB</span><span>CHUNKS → VECTORS</span></div>
+        <div className="embedding-grid">
+          <div className="lab-panel embedding-panel">
+            <h2 id="embedding-heading">Embed & store</h2>
+            <p>Generate embeddings for <strong>{document.filename}</strong> with OpenAI, then store the full vectors in pgvector.</p>
+            <span className="embedding-model">{embedding.model} · {embedding.dimensions.toLocaleString()} dimensions</span>
+            <button className="primary-button" type="button" onClick={handleEmbedding} disabled={busy || processing || embedding.status === "complete"}>
+              {processing ? "Embedding & storing…" : embedding.status === "complete" ? "All embeddings stored ✓" : embedding.status === "failed" || embedding.status === "interrupted" ? "Retry remaining chunks →" : "Embed & store chunks →"}
+            </button>
+            {embeddingBusy && <button className="cancel-search" type="button" onClick={() => {
+              embeddingRequest.current?.abort(); setEmbeddingBusy(false); setEmbeddingTraceStatus("cancelled");
+              setEmbedding(current => current ? { ...current, status: "processing" } : null);
+              setEmbeddingError("Cancellation requested. Checking saved progress while the server releases this run.");
+            }}>Cancel embedding</button>}
+            <div className="embedding-progress" role="status" aria-live="polite">
+              <strong>{embedding.status === "complete" ? `${embedding.embedded_chunks} chunks embedded and stored.` : `${embedding.embedded_chunks} of ${embedding.total_chunks} chunks embedded and stored.`}</strong>
+              <progress aria-label="Chunks embedded and stored" value={embedding.embedded_chunks} max={Math.max(1, embedding.total_chunks)} />
+              {processing && <span>Completed batches appear as they are saved.</span>}
+              {(embedding.status === "failed" || embedding.status === "interrupted") && <span>Saved vectors are retained. Retry resumes the remaining chunks.</span>}
+            </div>
+            {(embeddingError || embedding.error) && <p className="lab-error" role="alert">{embeddingError || embedding.error}</p>}
+          </div>
+          <div className="lab-panel embedding-trace-panel">
+            <ExecutionTrace title="Embedding execution" events={embeddingEvents} status={embeddingTraceStatus}
+              stages={[["embedding", "Embed"], ["storage", "Store vectors"]]} />
+          </div>
+        </div>
+      </section>}
       {document && <RetrievalWorkbench key={document.id} documentId={document.id} filename={document.filename}
         hasOriginalPdf={document.has_original_pdf}
         ready={!busy && !processing && !!embedding && embedding.total_chunks > 0 && embedding.embedded_chunks === embedding.total_chunks}

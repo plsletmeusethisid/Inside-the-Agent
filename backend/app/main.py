@@ -9,6 +9,7 @@ import pymupdf
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.concurrency import run_in_threadpool
+from starlette.responses import Response
 
 from app.ingestion import chunk_pages, parse_pdf
 from app.database import apply_schema
@@ -129,6 +130,7 @@ def ingest_document(filename, data, chunk_size, chunk_overlap, document_id, trac
                     "INSERT INTO documents (id, filename, page_count, chunk_size, chunk_overlap) VALUES (%s, %s, %s, %s, %s)",
                     (document_id, filename, len(pages), chunk_size, chunk_overlap),
                 )
+                cursor.execute("INSERT INTO document_files (document_id, pdf) VALUES (%s, %s)", (document_id, data))
                 cursor.executemany(
                     "INSERT INTO document_pages (document_id, page_number, content) VALUES (%s, %s, %s)",
                     [(document_id, page.number, page.content) for page in pages],
@@ -148,7 +150,9 @@ def get_document(document_id: UUID) -> dict:
     try:
         with database_connection() as connection:
             row = connection.execute(
-                "SELECT filename, page_count, chunk_size, chunk_overlap FROM documents WHERE id = %s",
+                """SELECT filename, page_count, chunk_size, chunk_overlap, created_at,
+                          EXISTS (SELECT 1 FROM document_files f WHERE f.document_id = documents.id)
+                   FROM documents WHERE id = %s""",
                 (document_id,),
             ).fetchone()
             if row is None:
@@ -157,9 +161,26 @@ def get_document(document_id: UUID) -> dict:
                 "SELECT page_number, content FROM document_pages WHERE document_id = %s ORDER BY page_number",
                 (document_id,),
             ).fetchall()
-        return {"id": str(document_id), "filename": row[0], "page_count": row[1], "chunk_size": row[2], "chunk_overlap": row[3], "pages": [{"number": p[0], "content": p[1]} for p in pages]}
+        return {"id": str(document_id), "filename": row[0], "page_count": row[1], "chunk_size": row[2], "chunk_overlap": row[3],
+                "created_at": row[4], "has_original_pdf": row[5], "pages": [{"number": p[0], "content": p[1]} for p in pages]}
     except psycopg.Error as exc:
         raise HTTPException(status_code=503, detail="Could not load document") from exc
+
+
+@app.get("/documents/{document_id}/pdf")
+def get_original_pdf(document_id: UUID):
+    """Open the original PDF; the browser's #page=N fragment selects its page."""
+    try:
+        with database_connection() as connection:
+            row = connection.execute("SELECT pdf FROM document_files WHERE document_id = %s", (document_id,)).fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="Original PDF is unavailable. Older uploads retain extracted text only.")
+        return Response(bytes(row[0]), media_type="application/pdf", headers={
+            "Content-Disposition": f'inline; filename="document-{document_id}.pdf"',
+            "X-Content-Type-Options": "nosniff", "Cache-Control": "private, no-store",
+        })
+    except psycopg.Error as exc:
+        raise HTTPException(status_code=503, detail="Could not load original PDF") from exc
 
 
 @app.get("/documents/{document_id}/chunks")

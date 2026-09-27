@@ -86,7 +86,28 @@ class StorageTests(unittest.TestCase):
             apply_schema(connection)
             row = connection.execute("SELECT content, embedding, embedding_status FROM chunks WHERE id = %s", (self.legacy_chunk,)).fetchone()
             self.assertEqual(row, ("Preserved legacy text", None, "pending"))
-            self.assertEqual(connection.execute("SELECT count(*) FROM schema_migrations").fetchone()[0], 1)
+            self.assertEqual(connection.execute("SELECT count(*) FROM schema_migrations").fetchone()[0], 2)
+
+    def test_original_pdf_roundtrip_and_legacy_document_fallback(self):
+        import pymupdf
+        with pymupdf.open() as pdf:
+            pdf.new_page().insert_text((72, 72), "Page one evidence.")
+            pdf.new_page().insert_text((72, 72), "Page two evidence.")
+            data = pdf.tobytes()
+        uploaded = self.client.post("/documents", files={"file": ("guide.pdf", data, "application/pdf")})
+        self.assertEqual(uploaded.status_code, 201)
+        document_id = uploaded.json()["id"]
+        metadata = self.client.get(f"/documents/{document_id}").json()
+        self.assertTrue(metadata["has_original_pdf"])
+        self.assertTrue(metadata["created_at"])
+        response = self.client.get(f"/documents/{document_id}/pdf")
+        self.assertEqual(response.content, data)
+        self.assertEqual(response.headers["content-type"], "application/pdf")
+        self.assertEqual(response.headers["x-content-type-options"], "nosniff")
+        legacy = self.client.get(f"/documents/{self.legacy_document}").json()
+        self.assertFalse(legacy["has_original_pdf"])
+        self.assertEqual(self.client.get(f"/documents/{self.legacy_document}/pdf").status_code, 404)
+        self.assertEqual(self.client.get(f"/documents/{uuid4()}/pdf").status_code, 404)
 
     @staticmethod
     def events(response):

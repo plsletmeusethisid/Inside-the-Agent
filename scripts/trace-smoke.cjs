@@ -2,6 +2,9 @@
 const { chromium } = require('../.verification/node_modules/playwright-core');
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const fs = require('node:fs');
+const demoUrl = process.env.DEMO_URL || 'http://localhost:3000';
+const apiUrl = process.env.DEMO_API_URL || 'http://localhost:8000';
 
 const frames = text => text.split(/\r?\n/).filter(line => line.startsWith('data: ')).map(line => JSON.parse(line.slice(6)));
 (async () => {
@@ -17,7 +20,7 @@ const frames = text => text.split(/\r?\n/).filter(line => line.startsWith('data:
       window.fetch = async (...args) => {
         const response = await originalFetch(...args);
         if (response.headers.get('content-type')?.includes('text/event-stream')) {
-          const key = String(args[0]);
+          const key = new URL(String(args[0]), window.location.href).href;
           response.clone().text().then(text => { window.traceBodies[key] = text; }).catch(() => {});
         }
         return response;
@@ -30,10 +33,12 @@ const frames = text => text.split(/\r?\n/).filter(line => line.startsWith('data:
       }).observe(document, { subtree: true, childList: true, attributes: true });
     });
     const readyPromise = page.waitForResponse(r => r.url().endsWith('/ready'));
-    await page.goto('http://localhost:3000');
+    await page.goto(demoUrl);
     const ready = await readyPromise;
     assert.equal(ready.status(), 200);
-    assert.equal(ready.headers()['access-control-allow-origin'], 'http://localhost:3000');
+    if (new URL(apiUrl).origin !== new URL(demoUrl).origin) {
+      assert.equal(ready.headers()['access-control-allow-origin'], new URL(demoUrl).origin);
+    }
     await page.waitForSelector('.service-status.ready');
     await page.locator('input[type=file]').setInputFiles(path.resolve('examples/it-support-guide.pdf'));
     await page.locator('input[type=range]').nth(0).press('Home');
@@ -51,6 +56,10 @@ const frames = text => text.split(/\r?\n/).filter(line => line.startsWith('data:
     assert.equal(upload.at(-1).event, 'completed', JSON.stringify(upload.at(-1)));
     const doc = upload.at(-1).data.result;
     assert.equal(doc.chunk_count, 5);
+    const original = await page.request.get(`${apiUrl}/documents/${doc.id}/pdf`);
+    assert.equal(original.status(), 200);
+    assert.match(original.headers()['content-type'], /application\/pdf/);
+    assert.deepEqual(await original.body(), fs.readFileSync('examples/it-support-guide.pdf'));
     console.log(JSON.stringify({ document: doc.id, upload: upload.map(e => e.event) }));
     await page.waitForSelector('.chunk-row');
     const embeddingPromise = page.waitForResponse(r => r.url().endsWith('/embeddings/stream'), { timeout: 120000 });
@@ -59,7 +68,7 @@ const frames = text => text.split(/\r?\n/).filter(line => line.startsWith('data:
     assert.equal(embedding.at(-1).event, 'completed', JSON.stringify(embedding.at(-1)));
     assert.equal(embedding.at(-1).data.result.embedded_chunks, 5);
     await page.waitForFunction(() => document.querySelector('.embedding-progress strong')?.textContent === '5 chunks embedded and stored.');
-    const before = await (await page.request.get(`http://localhost:8000/documents/${doc.id}/chunks`)).json();
+    const before = await (await page.request.get(`${apiUrl}/documents/${doc.id}/chunks`)).json();
     const answerButton = page.getByRole('button', { name: 'Answer from document' });
     async function ask(question, mode = 'answer') {
       await page.getByLabel('Question', { exact: true }).fill(question);
@@ -79,9 +88,22 @@ const frames = text => text.split(/\r?\n/).filter(line => line.startsWith('data:
       assert.ok(events.some(e => e.event === 'token'));
       assert.equal(await page.locator('.answer-text').innerText(), result.answer);
       for (let i = 0; i < result.citations.length; i++) {
+        const citation = result.citations[i];
+        const links = page.locator('.answer-citations li').nth(i);
+        await links.getByRole('link', { name: 'View retrieved passage' }).click();
+        assert.equal(await page.evaluate(() => document.activeElement.id), `evidence-${citation.chunk_id}`);
+        const pdfLink = await links.getByRole('link', { name: `Open PDF page ${citation.page_number}` }).getAttribute('href');
+        assert.equal(new URL(pdfLink, demoUrl).href, `${apiUrl}/documents/${doc.id}/pdf#page=${citation.page_number}`);
         await page.locator('.answer-citations button').nth(i).click();
         const content = result.context.find(c => c.chunk_id === result.citations[i].chunk_id).content;
         assert.equal(await page.locator('.page-text mark').innerText(), content);
+        const permalink = await links.getByRole('link', { name: 'Permalink to source' }).getAttribute('href');
+        const sourceTab = await browser.newPage();
+        await sourceTab.goto(new URL(permalink, demoUrl).href);
+        await sourceTab.locator('.page-text mark').waitFor();
+        assert.equal(await sourceTab.locator('.page-text mark').innerText(), content);
+        assert.equal(await sourceTab.locator('.trace-stage.complete').count(), 0);
+        await sourceTab.close();
       }
     }
     const observations = await page.evaluate(() => window.traceObservations);
@@ -116,7 +138,7 @@ const frames = text => text.split(/\r?\n/).filter(line => line.startsWith('data:
     assert.equal(await page.locator('.answer-text').count(), 0);
     assert.match(await page.getByRole('region', { name: 'Question execution' }).innerText(), /Cancelled/);
     await page.unroute('**/answer/stream');
-    const after = await (await page.request.get(`http://localhost:8000/documents/${doc.id}/chunks`)).json();
+    const after = await (await page.request.get(`${apiUrl}/documents/${doc.id}/chunks`)).json();
     assert.deepEqual(after, before);
     await page.reload();
     await page.waitForSelector('.chunk-row');

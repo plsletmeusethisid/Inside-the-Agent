@@ -23,8 +23,8 @@ type Retrieval = {
 };
 const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-export function RetrievalWorkbench({ documentId, filename, ready, onSelectChunk }: {
-  documentId: string; filename: string; ready: boolean; onSelectChunk: (id: string) => void;
+export function RetrievalWorkbench({ documentId, filename, ready, hasOriginalPdf, onSelectChunk }: {
+  documentId: string; filename: string; ready: boolean; hasOriginalPdf: boolean; onSelectChunk: (id: string) => void;
 }) {
   const [question, setQuestion] = useState("");
   const [k, setK] = useState(3);
@@ -125,6 +125,11 @@ export function RetrievalWorkbench({ documentId, filename, ready, onSelectChunk 
               <button type="button" onClick={() => onSelectChunk(citation.chunk_id)} title={citation.chunk_id}>
                 Chunk {citation.chunk_index + 1} · Page {citation.page_number} ↗
               </button>
+              <div className="citation-links">
+                <a href={`#evidence-${citation.chunk_id}`} onClick={() => window.document.getElementById(`evidence-${citation.chunk_id}`)?.focus({ preventScroll: true })}>View retrieved passage</a>
+                {hasOriginalPdf && <a href={`${api}/documents/${documentId}/pdf#page=${citation.page_number}`} target="_blank" rel="noopener noreferrer">Open PDF page {citation.page_number} ↗</a>}
+                <a href={`?document=${documentId}&chunk=${citation.chunk_id}#source-inspector`}>Permalink to source</a>
+              </div>
               <code>{citation.chunk_id}</code>
             </li>)}</ul>
           </>}
@@ -146,7 +151,7 @@ export function RetrievalWorkbench({ documentId, filename, ready, onSelectChunk 
         <p className="score-explanation">Cosine similarity = 1 − cosine distance. Higher means closer (−1 to 1); scores do not establish whether a passage answers your question. Displayed scores are rounded.</p>
         {result?.context && <h3>Exact context supplied to the model</h3>}
         {result && (result.results.length ? <ol className="retrieval-results" aria-label="Ranked chunks">
-          {result.results.map((chunk) => <li key={chunk.chunk_id}>
+          {result.results.map((chunk) => <li key={chunk.chunk_id} id={`evidence-${chunk.chunk_id}`} tabIndex={-1}>
             <button type="button" onClick={() => onSelectChunk(chunk.chunk_id)} aria-label={`Open source for rank ${chunk.rank}, chunk ${chunk.chunk_index + 1}, page ${chunk.page_number}`}>
               <span>#{chunk.rank} Chunk {chunk.chunk_index + 1} — <strong title={String(chunk.similarity)}>{chunk.similarity.toFixed(3)}</strong></span>
               <small>Page {chunk.page_number} · {chunk.token_count} tokens · Open source ↗</small>

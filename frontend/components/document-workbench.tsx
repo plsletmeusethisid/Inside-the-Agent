@@ -16,7 +16,7 @@ type EmbeddingSummary = {
   model: string; dimensions: number; total_chunks: number; embedded_chunks: number;
   remaining_chunks: number; failed_chunks: number; error: string | null;
 };
-type Document = { id: string; filename: string; page_count: number; chunk_size: number; chunk_overlap: number; pages: Page[] };
+type Document = { id: string; filename: string; page_count: number; chunk_size: number; chunk_overlap: number; pages: Page[]; created_at: string; has_original_pdf: boolean };
 type UploadResult = { id: string; chunk_count: number };
 
 const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -108,9 +108,11 @@ export function DocumentWorkbench() {
     setEmbeddingEvents([]); setEmbeddingTraceStatus("idle");
     setSize(doc.chunk_size);
     setOverlap(doc.chunk_overlap);
-    setSelectedIndex(0);
-    setListPage(0);
-    setSourcePage(chunkData.chunks[0]?.page_number ?? 1);
+    const linkedChunk = new URLSearchParams(window.location.search).get("chunk");
+    const index = Math.max(0, chunkData.chunks.findIndex(chunk => chunk.id === linkedChunk));
+    setSelectedIndex(index);
+    setListPage(Math.floor(index / pageSize));
+    setSourcePage(chunkData.chunks[index]?.page_number ?? 1);
   }
 
   async function handleEmbedding() {
@@ -223,7 +225,7 @@ export function DocumentWorkbench() {
           <ExecutionTrace title="Document execution" events={uploadEvents} status={uploadStatus}
             stages={[["parse", "Parse"], ["chunking", "Chunk"], ["storage", "Save pages & chunks"]]} />
           {document && !uploadEvents.length && <p>Saved document loaded. Past execution events are not replayed.</p>}
-          {document && <div className="lab-summary"><strong>{document.filename}</strong><span>{document.page_count} pages · {chunks.length} chunks</span><span>{document.chunk_size} token limit · {document.chunk_overlap} token overlap</span></div>}
+          {document && <div className="lab-summary"><strong>{document.filename}</strong><span>{document.page_count} pages · {chunks.length} chunks</span><span>{document.chunk_size} token limit · {document.chunk_overlap} token overlap</span><span>Uploaded {new Date(document.created_at).toLocaleString()}</span></div>}
           {document && embedding && <div className="embedding-panel">
             <h3>Embed & store</h3>
             <p>Send this document’s chunks to OpenAI to generate embeddings, then store the full vectors in pgvector.</p>
@@ -266,7 +268,7 @@ export function DocumentWorkbench() {
           </> : <div className="lab-empty">The chunks generated from your document will appear here. Select one to inspect its text and source page.</div>}
         </div>
 
-        <div className="lab-panel source-panel" ref={sourcePanel} tabIndex={-1} aria-label="Selected chunk source">
+        <div className="lab-panel source-panel" id="source-inspector" ref={sourcePanel} tabIndex={-1} aria-label="Selected chunk source">
           <div className="lab-kicker">03 — INSPECT <span>{selected ? `CHUNK ${selected.index + 1}` : "SOURCE VIEW"}</span></div>
           {document && selected ? <>
             <div className="inspector-header"><span>Chunk text</span><span>{selected.token_count} / {document.chunk_size} tokens</span></div>
@@ -276,12 +278,15 @@ export function DocumentWorkbench() {
               {selected.embedding_preview ? <><code className="vector-preview">{vectorPreview(selected.embedding_preview)}</code><p>The full vector is stored in pgvector. These rounded values are a small slice, not a 2D map of meaning.</p></> : <p>{selected.embedding_status === "failed" ? "This batch failed. Retry embedding to resume." : "A preview will appear after this chunk’s embedding is stored."}</p>}
             </div>
             <div className="inspector-header"><span>Extracted page {sourcePage}</span><span>{sourcePage} / {document.page_count}</span></div>
+            {document.has_original_pdf ? <a className="source-link" href={`${api}/documents/${document.id}/pdf#page=${sourcePage}`} target="_blank" rel="noopener noreferrer">Open original PDF · page {sourcePage} ↗</a> : <p className="source-note">This older upload has extracted text only. Upload it again to enable original PDF links.</p>}
+            <p className="source-note">The highlight below marks normalized extracted text. The PDF link opens its source page without a coordinate highlight.</p>
             <div className="page-controls"><button onClick={() => setSourcePage(Math.max(1, sourcePage - 1))} disabled={sourcePage === 1}>←</button><select aria-label="Source page" value={sourcePage} onChange={(e) => setSourcePage(Number(e.target.value))}>{document.pages.map((p) => <option value={p.number} key={p.number}>Page {p.number}</option>)}</select><button onClick={() => setSourcePage(Math.min(document.page_count, sourcePage + 1))} disabled={sourcePage === document.page_count}>→</button></div>
             <div className="page-text"><HighlightedSource content={page?.content ?? ""} highlight={sourcePage === selected.page_number ? selected.content : undefined} /></div>
           </> : <div className="lab-empty">Choose a chunk to see its full text beside the page it came from.</div>}
         </div>
       </div>
       {document && <RetrievalWorkbench key={document.id} documentId={document.id} filename={document.filename}
+        hasOriginalPdf={document.has_original_pdf}
         ready={!busy && !processing && !!embedding && embedding.total_chunks > 0 && embedding.embedded_chunks === embedding.total_chunks}
         onSelectChunk={(id) => {
           const index = chunks.findIndex((chunk) => chunk.id === id);
@@ -289,6 +294,7 @@ export function DocumentWorkbench() {
           setSelectedIndex(index);
           setListPage(Math.floor(index / pageSize));
           setSourcePage(chunks[index].page_number);
+          window.history.replaceState(null, "", `?document=${document.id}&chunk=${id}#source-inspector`);
           sourcePanel.current?.focus({ preventScroll: true });
           sourcePanel.current?.scrollIntoView({ behavior: "smooth", block: "center" });
         }} />}

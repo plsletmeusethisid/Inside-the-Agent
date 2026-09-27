@@ -1,0 +1,10 @@
+{$SITE_ADDRESS} {
+    handle_path /api/* {
+        reverse_proxy backend:8000 {
+            flush_interval -1
+        }
+    }
+    handle {
+        reverse_proxy frontend:3000
+    }
+}
